@@ -299,10 +299,12 @@ function randomString()
 	return table.concat(array)
 end
 
--- Backend-only parent: the legacy INC/INC interface is never parented
--- to PlayerGui/CoreGui, preventing the old GUI from appearing or flashing.
-PARENT = Instance.new("Folder")
+PARENT = Instance.new("ScreenGui")
 PARENT.Name = "INC_Backend"
+PARENT.ResetOnSpawn = false
+PARENT.IgnoreGuiInset = true
+PARENT.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+PARENT.Parent = COREGUI
 
 shade1 = {}
 shade2 = {}
