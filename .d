@@ -3,7 +3,16 @@ if INC_LOADED and not _G.INC_DEBUG then
 	return
 end
 
-pcall(function() getgenv().INC_LOADED = true end)
+local INC_GENV = getgenv()
+if INC_GENV.INC_LOADED and not _G.INC_DEBUG then
+	local existing = INC_GENV.INC_INSTANCE
+	if existing and typeof(existing) == "Instance" and existing.Parent then
+		return
+	end
+	INC_GENV.INC_LOADED = nil
+	INC_GENV.INC_INSTANCE = nil
+end
+INC_GENV.INC_LOADED = false
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 function missing(t, f, fallback)
@@ -299,12 +308,36 @@ function randomString()
 	return table.concat(array)
 end
 
-PARENT = Instance.new("ScreenGui")
-PARENT.Name = "INC_Backend"
-PARENT.ResetOnSpawn = false
-PARENT.IgnoreGuiInset = true
-PARENT.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-PARENT.Parent = COREGUI
+PARENT = nil
+MAX_DISPLAY_ORDER = math.huge
+
+if gethui then
+	local Main = Instance.new("ScreenGui")
+	Main.Name = randomString()
+	Main.ResetOnSpawn = false
+	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	Main.Parent = gethui()
+	PARENT = Main
+elseif syn_protect_gui then
+	local Main = Instance.new("ScreenGui")
+	Main.Name = randomString()
+	Main.ResetOnSpawn = false
+	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	pcall(syn_protect_gui, Main)
+	Main.Parent = COREGUI
+	PARENT = Main
+elseif COREGUI:FindFirstChild("RobloxGui") then
+	PARENT = COREGUI.RobloxGui
+else
+	local Main = Instance.new("ScreenGui")
+	Main.Name = randomString()
+	Main.ResetOnSpawn = false
+	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	Main.Parent = COREGUI
+	PARENT = Main
+end
+
+INC_GENV.INC_INSTANCE = PARENT
 
 shade1 = {}
 shade2 = {}
@@ -5386,7 +5419,7 @@ SpecialPlayerCases = {
 	["age(%d+)"] = function(speaker,args)
 		local returns = {}
 		local age = tonumber(args[1])
-		if not age == nil then return end
+		if age == nil then return end
 		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.AccountAge <= age then
 				table.insert(returns,plr)
@@ -7909,7 +7942,7 @@ addcmd('clientantikick',{'antikick'},function(args, speaker)
     	return oldNamecall(...)
 	end))
 	hookfunction(LocalPlayer.Kick, newcclosure(function(self, _)
-    	if self ~= lp then
+    	if self ~= LocalPlayer then
         	error("Expected ':' not '.' calling member function Kick", 2)
     	end
     	return nil
@@ -10223,8 +10256,8 @@ end)
 
 addcmd('loopanimation', {'loopanim'},function(args, speaker)
 	local Char = speaker.Character
-	local Human = Char and Char.FindFirstChildWhichIsA(Char, "Humanoid")
-	for _, v in ipairs(Human.GetPlayingAnimationTracks(Human)) do
+	local Human = Char and Char:FindFirstChildWhichIsA("Humanoid")
+	for _, v in ipairs(Human:GetPlayingAnimationTracks()) do
 		v.Looped = true
 	end
 end)
@@ -10990,7 +11023,7 @@ addcmd('fireclickdetectors',{'firecd','firecds'}, function(args, speaker)
 		if args[1] then
 			local name = getstring(1, args):lower()
 			for _, descendant in ipairs(workspace:GetDescendants()) do
-				if descendant:IsA("ClickDetector") and (descendant.Name:lower() == name or (descendant.Parent and descendant.Parent.Name:lower() == name)) then
+				if descendant:IsA("ClickDetector") and descendant.Name:lower() == name or descendant.Parent.Name:lower() == name then
 					fireclickdetector(descendant)
 				end
 			end
@@ -11019,7 +11052,7 @@ addcmd('fireproximityprompts',{'firepp'},function(args, speaker)
 		if args[1] then
 			local name = getstring(1, args)
 			for _, descendant in ipairs(workspace:GetDescendants()) do
-				if descendant:IsA("ProximityPrompt") and (descendant.Name == name or (descendant.Parent and descendant.Parent.Name == name)) then
+				if descendant:IsA("ProximityPrompt") and descendant.Name == name or descendant.Parent.Name == name then
 					fireproximityprompt(descendant)
 				end
 			end
@@ -11412,11 +11445,9 @@ addcmd('touchinterests', {'touchinterest', 'firetouchinterests', 'firetouchinter
 
 	local function Touch(x)
 		x = x:FindFirstAncestorWhichIsA("BasePart") or x
-		if x and x:IsA("BasePart") then
-			task.spawn(function()
-				firetouchinterest(x, Root, 1)
-				wait()
-				firetouchinterest(x, Root, 0)
+		if x then
+			return task.spawn(function()
+				firetouchinterest(x, Root, 1, wait() and firetouchinterest(x, Root, 0))
 			end)
 		end
 	end
@@ -11425,7 +11456,7 @@ addcmd('touchinterests', {'touchinterest', 'firetouchinterests', 'firetouchinter
 		local name = getstring(1, args):lower()
 		print(name..' -name')
 		for _, v in ipairs(workspace:GetDescendants()) do
-			if v:IsA("TouchTransmitter") and (v.Name:lower() == name or (v.Parent and v.Parent.Name:lower() == name)) then
+			if v:IsA("TouchTransmitter") and v.Name:lower() == name or v.Parent.Name:lower() == name then
 				Touch(v)
 			end
 		end
@@ -12788,15 +12819,15 @@ end)
 
 addcmd("mutevc", {}, function(args, speaker)
 	for _, plr in getPlayer(args[1], speaker) do
-		if Players[plr] == speaker then continue end
-		Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, true)
+		if plr == speaker then continue end
+		Services.VoiceChatInternal:SubscribePause(plr.UserId, true)
 	end
 end)
 
 addcmd("unmutevc", {}, function(args, speaker)
 	for _, plr in getPlayer(args[1], speaker) do
-		if Players[plr] == speaker then continue end
-		Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, false)
+		if plr == speaker then continue end
+		Services.VoiceChatInternal:SubscribePause(plr.UserId, false)
 	end
 end)
 
@@ -12891,28 +12922,25 @@ end)
 addcmd('tpunanchored',{'tpua'},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
-		local targetPlayer = Players:FindFirstChild(v)
 		local Forces = {}
-		if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild('Head') then
-			for _,part in pairs(workspace:GetDescendants()) do
-				if part:IsA("BasePart") and not part.Anchored and not part:IsDescendantOf(speaker.Character) and part.Name ~= "Torso" and part.Name ~= "Head" and part.Name ~= "Right Arm" and part.Name ~= "Left Arm" and part.Name ~= "Right Leg" and part.Name ~= "Left Leg" and part.Name ~= "HumanoidRootPart" then
-					for _,c in pairs(part:GetChildren()) do
-						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
-							c:Destroy()
-						end
-					end
-					local ForceInstance = Instance.new("BodyPosition")
-					ForceInstance.Parent = part
-					ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-					table.insert(Forces, ForceInstance)
-					if not table.find(frozenParts,part) then
-						table.insert(frozenParts,part)
+		for _,part in pairs(workspace:GetDescendants()) do
+			if Players[v].Character:FindFirstChild('Head') and part:IsA("BasePart" or "UnionOperation" or "Model") and part.Anchored == false and not part:IsDescendantOf(speaker.Character) and part.Name == "Torso" == false and part.Name == "Head" == false and part.Name == "Right Arm" == false and part.Name == "Left Arm" == false and part.Name == "Right Leg" == false and part.Name == "Left Leg" == false and part.Name == "HumanoidRootPart" == false then
+				for i,c in pairs(part:GetChildren()) do
+					if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+						c:Destroy()
 					end
 				end
+				local ForceInstance = Instance.new("BodyPosition")
+				ForceInstance.Parent = part
+				ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+				table.insert(Forces, ForceInstance)
+				if not table.find(frozenParts,part) then
+					table.insert(frozenParts,part)
+				end
 			end
-			for _,c in pairs(Forces) do
-				c.Position = targetPlayer.Character.Head.Position
-			end
+		end
+		for i,c in pairs(Forces) do
+			c.Position = Players[v].Character.Head.Position
 		end
 	end
 end)
@@ -14053,3 +14081,8 @@ do
 
     showHome()
 end
+
+
+-- Mark INC as successfully initialized only after the entire script has loaded.
+INC_GENV.INC_LOADED = true
+INC_GENV.INC_INSTANCE = PARENT
