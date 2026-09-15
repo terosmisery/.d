@@ -1,11 +1,17 @@
 local INC_GENV = getgenv()
-if INC_GENV.INC_LOADED and not _G.INC_DEBUG then
-	local existing = INC_GENV.INC_INSTANCE
-	if existing and typeof(existing) == "Instance" and existing.Parent then
-		return
+local existing = INC_GENV.INC_INSTANCE
+if existing and typeof(existing) == "Instance" and existing.Parent then
+	-- Remove the old hidden legacy backend GUI left by earlier INC versions.
+	if existing:IsA("ScreenGui") and existing.Name ~= "IncognolsConvenientMenu" then
+		pcall(function() existing:Destroy() end)
+		INC_GENV.INC_INSTANCE = nil
+	elseif existing.Name == "IncognolsConvenientMenu" then
+		if not _G.INC_DEBUG then
+			return
+		end
+		pcall(function() existing:Destroy() end)
+		INC_GENV.INC_INSTANCE = nil
 	end
-	INC_GENV.INC_LOADED = nil
-	INC_GENV.INC_INSTANCE = nil
 end
 INC_GENV.INC_LOADED = false
 if not game:IsLoaded() then game.Loaded:Wait() end
@@ -13431,6 +13437,7 @@ do
     gui.ResetOnSpawn = false
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = PlayerGui
+    INC_GENV.INC_INSTANCE = gui
 
     local main = Instance.new("Frame")
     main.Name = "Main"
@@ -13946,4 +13953,3 @@ end
 
 -- Mark INC as successfully initialized only after the entire script has loaded.
 INC_GENV.INC_LOADED = true
-INC_GENV.INC_INSTANCE = PARENT
