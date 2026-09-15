@@ -316,6 +316,7 @@ if gethui then
 	Main.Name = randomString()
 	Main.ResetOnSpawn = false
 	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	Main.Enabled = false
 	Main.Parent = gethui()
 	PARENT = Main
 elseif syn_protect_gui then
@@ -323,16 +324,16 @@ elseif syn_protect_gui then
 	Main.Name = randomString()
 	Main.ResetOnSpawn = false
 	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	Main.Enabled = false
 	pcall(syn_protect_gui, Main)
 	Main.Parent = COREGUI
 	PARENT = Main
-elseif COREGUI:FindFirstChild("RobloxGui") then
-	PARENT = COREGUI.RobloxGui
 else
 	local Main = Instance.new("ScreenGui")
 	Main.Name = randomString()
 	Main.ResetOnSpawn = false
 	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	Main.Enabled = false
 	Main.Parent = COREGUI
 	PARENT = Main
 end
@@ -351,8 +352,8 @@ ScaledHolder.Size = UDim2.fromScale(1, 1)
 ScaledHolder.BackgroundTransparency = 1
 ScaledHolder.Parent = PARENT
 Scale.Name = randomString()
--- Keep the legacy backend UI non-visible; the custom INC front-end below is the only visible GUI.
-ScaledHolder.Visible = false
+-- Legacy backend GUI is kept disabled; only the custom INC front-end is visible.
+ScaledHolder.Visible = true
 
 Holder.Name = randomString()
 Holder.Parent = ScaledHolder
@@ -10565,6 +10566,19 @@ addcmd('oldconsole',{},function(args, speaker)
 end)
 
 -- ================================================================
+-- ================================================================
+-- EXTERNAL GUI / TOOL COMMANDS
+-- Commands in this section load a separate external GUI/tool.
+-- This is only a reference section; the actual command implementations
+-- remain unchanged below.
+--   console / oldconsole  = Roblox console interfaces
+--   explorer / dex        = Dex++
+--   moondex / mdex        = Moon DEX
+--   remotespy / rspy      = Cobalt / RemoteSpy
+--   simplespy / sspy      = SimpleSpy V3
+--   audiologger / alogger = Audio Logger
+-- ================================================================
+
 -- EXTERNAL GUI / TOOL LOADERS
 -- These commands load separate external interfaces/tools such as Dex,
 -- Cobalt/RemoteSpy, SimpleSpy, and AudioLogger.
@@ -13277,34 +13291,6 @@ end
 
 INCMouse.Move:Connect(checkTT)
 
-CaptureService.CaptureBegan:Connect(function()
-	PARENT.Enabled = false
-end)
-
-CaptureService.CaptureEnded:Connect(function()
-	task.delay(0.1, function()
-		PARENT.Enabled = true
-	end)
-end)
-
-end)
-
-task.spawn(function()
-    task.wait()
-    pcall(function()
-        Credits:TweenPosition(UDim2.new(0, 0, 0.9, 0), "Out", "Quart", 0.2)
-        Logo:TweenSizeAndPosition(UDim2.new(0, 175, 0, 175), UDim2.new(0, 37, 0, 45), "Out", "Quart", 0.3)
-        task.wait(1)
-        local OutInfo = TweenInfo.new(1.6809, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0)
-        TweenService:Create(Logo, OutInfo, {ImageTransparency = 1}):Play()
-        TweenService:Create(IntroBackground, OutInfo, {BackgroundTransparency = 1}):Play()
-        Credits:TweenPosition(UDim2.new(0, 0, 0.9, 30), "Out", "Quart", 0.2)
-        task.wait(0.2)
-    end)
-    Logo:Destroy()
-    Credits:Destroy()
-    IntroBackground:Destroy()
-    minimizeHolder()
 end)
 
 -- ================================================================
@@ -13322,7 +13308,6 @@ do
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     -- Keep the original command backend alive without rendering its legacy UI.
-    -- The parent was intentionally changed to a non-GUI Folder above.
     pcall(function() Holder.Visible = false end)
     pcall(function() Tooltip.Visible = false end)
     pcall(function() Notification.Visible = false end)
