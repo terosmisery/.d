@@ -303,35 +303,10 @@ function randomString()
 	return table.concat(array)
 end
 
-PARENT = nil
-MAX_DISPLAY_ORDER = math.huge
-
-if gethui then
-	local Main = Instance.new("ScreenGui")
-	Main.Name = randomString()
-	Main.ResetOnSpawn = false
-	Main.DisplayOrder = MAX_DISPLAY_ORDER
-	Main.Enabled = false
-	Main.Parent = gethui()
-	PARENT = Main
-elseif syn_protect_gui then
-	local Main = Instance.new("ScreenGui")
-	Main.Name = randomString()
-	Main.ResetOnSpawn = false
-	Main.DisplayOrder = MAX_DISPLAY_ORDER
-	Main.Enabled = false
-	pcall(syn_protect_gui, Main)
-	Main.Parent = COREGUI
-	PARENT = Main
-else
-	local Main = Instance.new("ScreenGui")
-	Main.Name = randomString()
-	Main.ResetOnSpawn = false
-	Main.DisplayOrder = MAX_DISPLAY_ORDER
-	Main.Enabled = false
-	Main.Parent = COREGUI
-	PARENT = Main
-end
+-- Internal backend container only. It is intentionally a Folder so the legacy
+-- INC/IY interface can never render. The visible interface is the custom INC front-end below.
+PARENT = Instance.new("Folder")
+PARENT.Name = "INC_Backend"
 
 INC_GENV.INC_INSTANCE = PARENT
 
@@ -347,8 +322,6 @@ ScaledHolder.Size = UDim2.fromScale(1, 1)
 ScaledHolder.BackgroundTransparency = 1
 ScaledHolder.Parent = PARENT
 Scale.Name = randomString()
--- Legacy backend GUI is kept disabled; only the custom INC front-end is visible.
-ScaledHolder.Visible = true
 
 Holder.Name = randomString()
 Holder.Parent = ScaledHolder
