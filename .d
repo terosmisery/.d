@@ -1,8 +1,3 @@
-if INC_LOADED and not _G.INC_DEBUG then
-	-- error("INC is already running!", 0)
-	return
-end
-
 local INC_GENV = getgenv()
 if INC_GENV.INC_LOADED and not _G.INC_DEBUG then
 	local existing = INC_GENV.INC_INSTANCE
