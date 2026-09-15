@@ -2728,7 +2728,7 @@ eventEditor = (function()
 	end
 
 	main.TopBar.Close.MouseButton1Click:Connect(function()
-		main:TweenPosition(UDim2.new(0.5,-175,0,-500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		main:TweenPosition(UDim2.new(0.5,-175,0,-500), "InOut", "Quart", 0.5, true, nil)
 	end)
 	dragGUI(main)
 	main.Parent = ScaledHolder
@@ -2874,7 +2874,7 @@ reference = (function()
 	table.insert(shade2,main.TopBar)
 	main.Name = randomString()
 	main.TopBar.Close.MouseButton1Click:Connect(function()
-		main:TweenPosition(UDim2.new(0.5,-250,0,-500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		main:TweenPosition(UDim2.new(0.5,-250,0,-500), "InOut", "Quart", 0.5, true, nil)
 	end)
 	local inviteButton = main:FindFirstChild("InviteButton",true)
 	local lastPress = nil
@@ -2895,7 +2895,7 @@ reference = (function()
 	main.Parent = ScaledHolder
 
 	ReferenceButton.MouseButton1Click:Connect(function()
-		main:TweenPosition(UDim2.new(0.5,-250,0.5,-150), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		main:TweenPosition(UDim2.new(0.5,-250,0.5,-150), "InOut", "Quart", 0.5, true, nil)
 	end)
 end)()
 
@@ -3020,10 +3020,10 @@ function createPopup(title, text)
 	ExitImage.Image = getcustomasset("infiniteyield/assets/close.png")
 	ExitImage.ZIndex = 10
 
-	Popup:TweenPosition(UDim2.new(0.5, -180, 0, 150), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	Popup:TweenPosition(UDim2.new(0.5, -180, 0, 150), "InOut", "Quart", 0.5, true, nil)
 
 	Exit.MouseButton1Click:Connect(function()
-		Popup:TweenPosition(UDim2.new(0.5, -180, 0, -500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Popup:TweenPosition(UDim2.new(0.5, -180, 0, -500), "InOut", "Quart", 0.5, true, nil)
 		task.wait(0.6)
 		Popup:Destroy()
 	end)
@@ -3191,20 +3191,20 @@ end
 
 function maximizeHolder()
 	if StayOpen == false then
-		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, -220), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.2, true, nil)
+		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, -220), "InOut", "Quart", 0.2, true, nil)
 	end
 end
 
 minimizeNum = -20
 function minimizeHolder()
 	if StayOpen == false then
-		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, minimizeNum), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, minimizeNum), "InOut", "Quart", 0.5, true, nil)
 	end
 end
 
 function cmdbarHolder()
 	if StayOpen == false then
-		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, -45), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, -45), "InOut", "Quart", 0.5, true, nil)
 	end
 end
 
@@ -3225,7 +3225,7 @@ function notify(text,text2,length)
 				Title_2.BackgroundTransparency = 0
 			end)
 		end)
-		Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, 0), "InOut", "Quart", 0.5, true, nil)
 		wait(0.6)
 		local closepressed = false
 		if text2 then
@@ -3235,9 +3235,9 @@ function notify(text,text2,length)
 			Title_2.Text = 'Notification'
 			Text_2.Text = text
 		end
-		Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, -100), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, -100), "InOut", "Quart", 0.5, true, nil)
 		CloseButton.MouseButton1Click:Connect(function()
-			Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+			Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, 0), "InOut", "Quart", 0.5, true, nil)
 			closepressed = true
 			pinNotification:Disconnect()
 		end)
@@ -3249,7 +3249,7 @@ function notify(text,text2,length)
 		if LnotifyCount == notifyCount then
 			if closepressed == false and notificationPinned == false then
 				pinNotification:Disconnect()
-				Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+				Notification:TweenPosition(UDim2.new(1, Notification.Position.X.Offset, 1, 0), "InOut", "Quart", 0.5, true, nil)
 			end
 			notifyCount = 0
 		end
@@ -3302,7 +3302,7 @@ function CreateLabel(Name, Text)
 		table.insert(text1,tl)
 		scroll_2.CanvasSize = UDim2.new(0,0,0,alls+tl.TextBounds.Y)
 		scroll_2.CanvasPosition = Vector2.new(0,scroll_2.CanvasPosition.Y+tl.TextBounds.Y)
-		tl:TweenPosition(UDim2.new(0,3,0,alls), (Enum.EasingDirection.In, Enum.EasingStyle.Quint), 0.5)
+		tl:TweenPosition(UDim2.new(0,3,0,alls), 'In', 'Quint', 0.5)
 		TweenService:Create(tl, TweenInfo.new(1.25, Enum.EasingStyle.Linear), { TextTransparency = 0 }):Play()
 	end
 end
@@ -3812,7 +3812,7 @@ ColorsButton.MouseButton1Click:Connect(function()
 				defaultButton.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement then defaultButton.BackgroundTransparency = 0 end end)
 
 				pickerExit.MouseButton1Click:Connect(function()
-					picker:TweenPosition(UDim2.new(0.5, -219, 0, -500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+					picker:TweenPosition(UDim2.new(0.5, -219, 0, -500), "InOut", "Quart", 0.5, true, nil)
 				end)
 
 				updateColor()
@@ -3827,7 +3827,7 @@ ColorsButton.MouseButton1Click:Connect(function()
 			end
 		end
 
-		picker:TweenPosition(UDim2.new(0.5, -219, 0, 100), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		picker:TweenPosition(UDim2.new(0.5, -219, 0, 100), "InOut", "Quart", 0.5, true, nil)
 
 		local Npicker = ColorPicker.new()
 		Npicker.Confirm = function(self,color,ctype) updateColors(color,ctype) wait() updatesaves() end
@@ -3852,18 +3852,18 @@ ColorsButton.MouseButton1Click:Connect(function()
 			updatesaves()
 		end
 	else
-		picker:TweenPosition(UDim2.new(0.5, -219, 0, 100), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		picker:TweenPosition(UDim2.new(0.5, -219, 0, 100), "InOut", "Quart", 0.5, true, nil)
 	end
 end)
 
 
 SettingsButton.MouseButton1Click:Connect(function()
 	if SettingsOpen == false then SettingsOpen = true
-		Settings:TweenPosition(UDim2.new(0, 0, 0, 45), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Settings:TweenPosition(UDim2.new(0, 0, 0, 45), "InOut", "Quart", 0.5, true, nil)
 		CMDsF.Visible = false
 	else SettingsOpen = false
 		CMDsF.Visible = true
-		Settings:TweenPosition(UDim2.new(0, 0, 0, 220), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Settings:TweenPosition(UDim2.new(0, 0, 0, 220), "InOut", "Quart", 0.5, true, nil)
 	end
 end)
 
@@ -4047,40 +4047,40 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 Exit.MouseButton1Down:Connect(function()
-	logs:TweenPosition(UDim2.new(0, 0, 1, 10), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.3, true, nil)
+	logs:TweenPosition(UDim2.new(0, 0, 1, 10), "InOut", "Quart", 0.3, true, nil)
 end)
 
 Hide.MouseButton1Down:Connect(function()
 	if logs.Position ~= UDim2.new(0, 0, 1, -20) then
-		logs:TweenPosition(UDim2.new(0, 0, 1, -20), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.3, true, nil)
+		logs:TweenPosition(UDim2.new(0, 0, 1, -20), "InOut", "Quart", 0.3, true, nil)
 	else
-		logs:TweenPosition(UDim2.new(0, 0, 1, -265), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.3, true, nil)
+		logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
 	end
 end)
 
 EventBind.MouseButton1Click:Connect(function()
-	eventEditor.Frame:TweenPosition(UDim2.new(0.5,-175,0.5,-101), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	eventEditor.Frame:TweenPosition(UDim2.new(0.5,-175,0.5,-101), "InOut", "Quart", 0.5, true, nil)
 end)
 
 Keybinds.MouseButton1Click:Connect(function()
-	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "InOut", "Quart", 0.5, true, nil)
 	wait(0.5)
 	SettingsHolder.Visible = false
 end)
 
 Close.MouseButton1Click:Connect(function()
 	SettingsHolder.Visible = true
-	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
 end)
 
 Keybinds.MouseButton1Click:Connect(function()
-	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "InOut", "Quart", 0.5, true, nil)
 	wait(0.5)
 	SettingsHolder.Visible = false
 end)
 
 Add.MouseButton1Click:Connect(function()
-	KeybindEditor:TweenPosition(UDim2.new(0.5, -180, 0, 260), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	KeybindEditor:TweenPosition(UDim2.new(0.5, -180, 0, 260), "InOut", "Quart", 0.5, true, nil)
 end)
 
 Delete.MouseButton1Click:Connect(function()
@@ -4092,22 +4092,22 @@ end)
 
 Close_2.MouseButton1Click:Connect(function()
 	SettingsHolder.Visible = true
-	AliasesFrame:TweenPosition(UDim2.new(0, 0, 0, 175), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	AliasesFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
 end)
 
 Aliases.MouseButton1Click:Connect(function()
-	AliasesFrame:TweenPosition(UDim2.new(0, 0, 0, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	AliasesFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "InOut", "Quart", 0.5, true, nil)
 	wait(0.5)
 	SettingsHolder.Visible = false
 end)
 
 Close_3.MouseButton1Click:Connect(function()
 	SettingsHolder.Visible = true
-	PositionsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	PositionsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
 end)
 
 Positions.MouseButton1Click:Connect(function()
-	PositionsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	PositionsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "InOut", "Quart", 0.5, true, nil)
 	wait(0.5)
 	SettingsHolder.Visible = false
 end)
@@ -4127,7 +4127,7 @@ selected.Parent = PARENT
 local ActivateHighlight = nil
 local ClickSelect = nil
 function selectPart()
-	ToPartFrame:TweenPosition(UDim2.new(0.5, -180, 0, 335), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	ToPartFrame:TweenPosition(UDim2.new(0.5, -180, 0, 335), "InOut", "Quart", 0.5, true, nil)
 	local function HighlightPart()
 		if selected.Adornee ~= IYMouse.Target then
 			selectionBox.Adornee = IYMouse.Target
@@ -4150,7 +4150,7 @@ Part.MouseButton1Click:Connect(function()
 end)
 
 Exit_4.MouseButton1Click:Connect(function()
-	ToPartFrame:TweenPosition(UDim2.new(0.5, -180, 0, -500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	ToPartFrame:TweenPosition(UDim2.new(0.5, -180, 0, -500), "InOut", "Quart", 0.5, true, nil)
 	if ActivateHighlight then
 		ActivateHighlight:Disconnect()
 	end
@@ -4223,8 +4223,8 @@ end
 
 function UpdateToViewport()
 	if Holder.Position.X.Offset < -CamViewport() then
-		Holder:TweenPosition(UDim2.new(1, -CamViewport(), Holder.Position.Y.Scale, Holder.Position.Y.Offset), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.04, true, nil)
-		Notification:TweenPosition(UDim2.new(1, -CamViewport() + 250, Notification.Position.Y.Scale, Notification.Position.Y.Offset), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.04, true, nil)
+		Holder:TweenPosition(UDim2.new(1, -CamViewport(), Holder.Position.Y.Scale, Holder.Position.Y.Offset), "InOut", "Quart", 0.04, true, nil)
+		Notification:TweenPosition(UDim2.new(1, -CamViewport() + 250, Notification.Position.Y.Scale, Notification.Position.Y.Offset), "InOut", "Quart", 0.04, true, nil)
 	end
 end
 CameraChanged = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(UpdateToViewport)
@@ -4267,7 +4267,7 @@ function dragMain(dragpoint,gui)
 				local Position = UDim2.new(1, -250, gui.Position.Y.Scale, gui.Position.Y.Offset)
 				TweenService:Create(gui, TweenInfo.new(.20), {Position = Position}):Play()
 			elseif -CamViewport() > startPos.X.Offset + delta.X then
-				gui:TweenPosition(UDim2.new(1, -CamViewport(), gui.Position.Y.Scale, gui.Position.Y.Offset), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.04, true, nil)
+				gui:TweenPosition(UDim2.new(1, -CamViewport(), gui.Position.Y.Scale, gui.Position.Y.Offset), "InOut", "Quart", 0.04, true, nil)
 				local Position = UDim2.new(1, -CamViewport(), gui.Position.Y.Scale, gui.Position.Y.Offset)
 				TweenService:Create(gui, TweenInfo.new(.20), {Position = Position}):Play()
 				local Position2 = UDim2.new(1, -CamViewport() + 250, Notification.Position.Y.Scale, Notification.Position.Y.Offset)
@@ -4383,14 +4383,14 @@ task.spawn(function()
 				if SettingsOpen == true then
 					wait(0.2)
 					CMDsF.Visible = true
-					Settings:TweenPosition(UDim2.new(0, 0, 0, 220), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.2, true, nil)
+					Settings:TweenPosition(UDim2.new(0, 0, 0, 220), "InOut", "Quart", 0.2, true, nil)
 				end
 				IndexContents(PlayerGui.Chat.Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar.Text:lower():sub(2),true)
 			else
 				minimizeHolder()
 				if SettingsOpen == true then
 					wait(0.2)
-					Settings:TweenPosition(UDim2.new(0, 0, 0, 45), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.2, true, nil)
+					Settings:TweenPosition(UDim2.new(0, 0, 0, 45), "InOut", "Quart", 0.2, true, nil)
 					CMDsF.Visible = false
 				end
 			end
@@ -5662,7 +5662,7 @@ Cmdbar.FocusLost:Connect(function(enterpressed)
 		IndexContents('',true,false,true)
 		if SettingsOpen == true then
 			wait(0.2)
-			Settings:TweenPosition(UDim2.new(0, 0, 0, 45), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.2, true, nil)
+			Settings:TweenPosition(UDim2.new(0, 0, 0, 45), "InOut", "Quart", 0.2, true, nil)
 			CMDsF.Visible = false
 		end
 	end
@@ -5675,7 +5675,7 @@ Cmdbar.Focused:Connect(function()
 	if SettingsOpen == true then
 		wait(0.2)
 		CMDsF.Visible = true
-		Settings:TweenPosition(UDim2.new(0, 0, 0, 220), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.2, true, nil)
+		Settings:TweenPosition(UDim2.new(0, 0, 0, 220), "InOut", "Quart", 0.2, true, nil)
 	end
 	tabComplete = UserInputService.InputBegan:Connect(function(input,gameProcessed)
 		if Cmdbar:IsFocused() then
@@ -6153,7 +6153,7 @@ Exit_2.MouseButton1Click:Connect(function()
 	bindChosenKeyUp = false
 	BindTriggerSelect.Text = "KeyDown"
 	keySelected = false
-	KeybindEditor:TweenPosition(UDim2.new(0.5, -180, 0, -500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	KeybindEditor:TweenPosition(UDim2.new(0.5, -180, 0, -500), "InOut", "Quart", 0.5, true, nil)
 end)
 
 function onInputBegan(input,gameProcessed)
@@ -6453,17 +6453,17 @@ AddPlugin.MouseButton1Click:Connect(function()
 end)
 
 Exit_3.MouseButton1Click:Connect(function()
-	PluginEditor:TweenPosition(UDim2.new(0.5, -180, 0, -500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	PluginEditor:TweenPosition(UDim2.new(0.5, -180, 0, -500), "InOut", "Quart", 0.5, true, nil)
 	FileName.Text = 'Plugin File Name'
 end)
 
 Add_3.MouseButton1Click:Connect(function()
-	PluginEditor:TweenPosition(UDim2.new(0.5, -180, 0, 310), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	PluginEditor:TweenPosition(UDim2.new(0.5, -180, 0, 310), "InOut", "Quart", 0.5, true, nil)
 end)
 
 Plugins.MouseButton1Click:Connect(function()
 	if writefileExploit() then
-		PluginsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		PluginsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "InOut", "Quart", 0.5, true, nil)
 		wait(0.5)
 		SettingsHolder.Visible = false
 	else
@@ -6473,7 +6473,7 @@ end)
 
 Close_4.MouseButton1Click:Connect(function()
 	SettingsHolder.Visible = true
-	PluginsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	PluginsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
 end)
 
 local TeleportCheck = false
@@ -6858,10 +6858,10 @@ addcmd('serverinfo',{'info','sinfo'},function(args, speaker)
 		table.insert(text1,CopyPlcName)
 
 		local SINFOGUI = background
-		FRAME:TweenPosition(UDim2.new(0.5, -130, 0, 100), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil) 
+		FRAME:TweenPosition(UDim2.new(0.5, -130, 0, 100), "InOut", "Quart", 0.5, true, nil) 
 		wait(0.5)
 		Exit.MouseButton1Click:Connect(function()
-			FRAME:TweenPosition(UDim2.new(0.5, -130, 0, -500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil) 
+			FRAME:TweenPosition(UDim2.new(0.5, -130, 0, -500), "InOut", "Quart", 0.5, true, nil) 
 			wait(0.6)
 			FRAME:Destroy()
 			canOpenServerinfo = true
@@ -6970,7 +6970,7 @@ addcmd("inviteprompt", {}, function(args, speaker)
 		ExperienceService:LaunchExperience({
 			placeId = PlaceId,
 			gameInstanceId = JobId,
-			referredByPlayerId = plr[1].UserId
+			referredByPlayerId = plrs[1].UserId
 		})
 	end
 end)
@@ -7531,13 +7531,13 @@ end)
 
 addcmd('waypoints',{'positions'},function(args, speaker)
 	if SettingsOpen == false then SettingsOpen = true
-		Settings:TweenPosition(UDim2.new(0, 0, 0, 45), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+		Settings:TweenPosition(UDim2.new(0, 0, 0, 45), "InOut", "Quart", 0.5, true, nil)
 		CMDsF.Visible = false
 	end
-	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
-	AliasesFrame:TweenPosition(UDim2.new(0, 0, 0, 175), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
-	PluginsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
-	PositionsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+	KeybindsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
+	AliasesFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
+	PluginsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
+	PositionsFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "InOut", "Quart", 0.5, true, nil)
 	wait(0.5)
 	SettingsHolder.Visible = false
 	maximizeHolder()
@@ -10988,7 +10988,7 @@ addcmd('fireclickdetectors',{'firecd','firecds'}, function(args, speaker)
 		if args[1] then
 			local name = getstring(1, args):lower()
 			for _, descendant in ipairs(workspace:GetDescendants()) do
-				if descendant:IsA("ClickDetector") and descendant.Name:lower() == name or descendant.Parent.Name:lower() == name then
+				if descendant:IsA("ClickDetector") and (descendant.Name:lower() == name or (descendant.Parent and descendant.Parent.Name:lower() == name)) then
 					fireclickdetector(descendant)
 				end
 			end
@@ -11017,7 +11017,7 @@ addcmd('fireproximityprompts',{'firepp'},function(args, speaker)
 		if args[1] then
 			local name = getstring(1, args)
 			for _, descendant in ipairs(workspace:GetDescendants()) do
-				if descendant:IsA("ProximityPrompt") and descendant.Name == name or descendant.Parent.Name == name then
+				if descendant:IsA("ProximityPrompt") and (descendant.Name == name or (descendant.Parent and descendant.Parent.Name == name)) then
 					fireproximityprompt(descendant)
 				end
 			end
@@ -11335,12 +11335,12 @@ local function GetHandleTools(p)
 	p = p or Players.LocalPlayer
 	local r = {}
 	for _, v in ipairs(p.Character and p.Character:GetChildren() or {}) do
-		if v.IsA(v, "BackpackItem") and v.FindFirstChild(v, "Handle") then
+		if v:IsA("BackpackItem") and v:FindFirstChild("Handle") then
 			r[#r + 1] = v
 		end
 	end
 	for _, v in ipairs(p.Backpack:GetChildren()) do
-		if v.IsA(v, "BackpackItem") and v.FindFirstChild(v, "Handle") then
+		if v:IsA("BackpackItem") and v:FindFirstChild("Handle") then
 			r[#r + 1] = v
 		end
 	end
@@ -11409,26 +11409,27 @@ addcmd('touchinterests', {'touchinterest', 'firetouchinterests', 'firetouchinter
 	end
 
 	local function Touch(x)
-		x = x.FindFirstAncestorWhichIsA(x, "Part")
-		if x then
-			return task.spawn(function()
-				firetouchinterest(x, Root, 1, wait() and firetouchinterest(x, Root, 0))
+		x = x:FindFirstAncestorWhichIsA("BasePart") or x
+		if x and x:IsA("BasePart") then
+			task.spawn(function()
+				firetouchinterest(x, Root, 1)
+				wait()
+				firetouchinterest(x, Root, 0)
 			end)
 		end
-		x.CFrame = Root.CFrame
 	end
 
 	if args[1] then
 		local name = getstring(1, args):lower()
 		print(name..' -name')
 		for _, v in ipairs(workspace:GetDescendants()) do
-			if v:IsA("TouchTransmitter") and v.Name:lower() == name or v.Parent.Name:lower() == name then
+			if v:IsA("TouchTransmitter") and (v.Name:lower() == name or (v.Parent and v.Parent.Name:lower() == name)) then
 				Touch(v)
 			end
 		end
 	else
 		for _, v in ipairs(workspace:GetDescendants()) do
-			if v.IsA(v, "TouchTransmitter") then
+			if v:IsA("TouchTransmitter") then
 				Touch(v)
 			end
 		end
@@ -11690,7 +11691,7 @@ addcmd("logs", {}, function(args, speaker)
 	jLogsEnabled = true
 	Toggle.Text = "Enabled"
 	Toggle_2.Text = "Enabled"
-	logs:TweenPosition(UDim2.new(0, 0, 1, -265), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.3, true, nil)
+	logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
 end)
 
 addcmd("chatlogs", {"clogs"}, function(args, speaker)
@@ -11704,7 +11705,7 @@ addcmd("chatlogs", {"clogs"}, function(args, speaker)
 	selectJoin.BackgroundColor3 = currentShade3
 	selectChat.BackgroundColor3 = currentShade2
 	Toggle.Text = "Enabled"
-	logs:TweenPosition(UDim2.new(0, 0, 1, -265), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.3, true, nil)
+	logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
 end)
 
 addcmd("joinlogs", {"jlogs"}, function(args, speaker)
@@ -11718,7 +11719,7 @@ addcmd("joinlogs", {"jlogs"}, function(args, speaker)
 	selectChat.BackgroundColor3 = currentShade3
 	selectJoin.BackgroundColor3 = currentShade2
 	Toggle_2.Text = "Enabled"
-	logs:TweenPosition(UDim2.new(0, 0, 1, -265), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.3, true, nil)
+	logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
 end)
 
 addcmd("chatlogswebhook", {"logswebhook"}, function(args, speaker)
@@ -12835,7 +12836,7 @@ addcmd('freezeunanchored',{'freezeua'},function(args, speaker)
 		"HumanoidRootPart"
 	}
 	local function FREEZENOOB(v)
-		if v:IsA("BasePart" or "UnionOperation") and v.Anchored == false then
+		if v:IsA("BasePart") and v.Anchored == false then
 			local BADD = false
 			for i = 1,#badnames do
 				if v.Name == badnames[i] then
@@ -12888,25 +12889,28 @@ end)
 addcmd('tpunanchored',{'tpua'},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
+		local targetPlayer = Players:FindFirstChild(v)
 		local Forces = {}
-		for _,part in pairs(workspace:GetDescendants()) do
-			if Players[v].Character:FindFirstChild('Head') and part:IsA("BasePart" or "UnionOperation" or "Model") and part.Anchored == false and not part:IsDescendantOf(speaker.Character) and part.Name == "Torso" == false and part.Name == "Head" == false and part.Name == "Right Arm" == false and part.Name == "Left Arm" == false and part.Name == "Right Leg" == false and part.Name == "Left Leg" == false and part.Name == "HumanoidRootPart" == false then
-				for i,c in pairs(part:GetChildren()) do
-					if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
-						c:Destroy()
+		if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild('Head') then
+			for _,part in pairs(workspace:GetDescendants()) do
+				if part:IsA("BasePart") and not part.Anchored and not part:IsDescendantOf(speaker.Character) and part.Name ~= "Torso" and part.Name ~= "Head" and part.Name ~= "Right Arm" and part.Name ~= "Left Arm" and part.Name ~= "Right Leg" and part.Name ~= "Left Leg" and part.Name ~= "HumanoidRootPart" then
+					for _,c in pairs(part:GetChildren()) do
+						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+							c:Destroy()
+						end
+					end
+					local ForceInstance = Instance.new("BodyPosition")
+					ForceInstance.Parent = part
+					ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+					table.insert(Forces, ForceInstance)
+					if not table.find(frozenParts,part) then
+						table.insert(frozenParts,part)
 					end
 				end
-				local ForceInstance = Instance.new("BodyPosition")
-				ForceInstance.Parent = part
-				ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-				table.insert(Forces, ForceInstance)
-				if not table.find(frozenParts,part) then
-					table.insert(frozenParts,part)
-				end
 			end
-		end
-		for i,c in pairs(Forces) do
-			c.Position = Players[v].Character.Head.Position
+			for _,c in pairs(Forces) do
+				c.Position = targetPlayer.Character.Head.Position
+			end
 		end
 	end
 end)
@@ -13336,10 +13340,10 @@ task.spawn(function()
 			ExitImage.ZIndex = 10
 
 			task.wait(1)
-			AnnGUI:TweenPosition(UDim2.new(0.5, -180, 0, 150), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+			AnnGUI:TweenPosition(UDim2.new(0.5, -180, 0, 150), "InOut", "Quart", 0.5, true, nil)
 
 			Exit.MouseButton1Click:Connect(function()
-				AnnGUI:TweenPosition(UDim2.new(0.5, -180, 0, -500), (Enum.EasingDirection.InOut, Enum.EasingStyle.Quart), 0.5, true, nil)
+				AnnGUI:TweenPosition(UDim2.new(0.5, -180, 0, -500), "InOut", "Quart", 0.5, true, nil)
 				task.wait(0.6)
 				AnnGUI:Destroy()
 			end)
@@ -13350,13 +13354,13 @@ end)
 task.spawn(function()
     task.wait()
     pcall(function()
-        Credits:TweenPosition(UDim2.new(0, 0, 0.9, 0), (Enum.EasingDirection.Out, Enum.EasingStyle.Quart), 0.2)
-        Logo:TweenSizeAndPosition(UDim2.new(0, 175, 0, 175), UDim2.new(0, 37, 0, 45), (Enum.EasingDirection.Out, Enum.EasingStyle.Quart), 0.3)
+        Credits:TweenPosition(UDim2.new(0, 0, 0.9, 0), "Out", "Quart", 0.2)
+        Logo:TweenSizeAndPosition(UDim2.new(0, 175, 0, 175), UDim2.new(0, 37, 0, 45), "Out", "Quart", 0.3)
         task.wait(1)
         local OutInfo = TweenInfo.new(1.6809, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0)
         TweenService:Create(Logo, OutInfo, {ImageTransparency = 1}):Play()
         TweenService:Create(IntroBackground, OutInfo, {BackgroundTransparency = 1}):Play()
-        Credits:TweenPosition(UDim2.new(0, 0, 0.9, 30), (Enum.EasingDirection.Out, Enum.EasingStyle.Quart), 0.2)
+        Credits:TweenPosition(UDim2.new(0, 0, 0.9, 30), "Out", "Quart", 0.2)
         task.wait(0.2)
     end)
     Logo:Destroy()
@@ -13461,7 +13465,7 @@ do
                 }
                 meta.AliasText = #aliases > 0 and (" / " .. table.concat(aliases, " / ")) or ""
                 local upperRaw = (rawName .. " " .. rawDesc):upper()
-                if upperRaw:find("(CLIENT)", 1, true) then
+                if upperRaw:find("%(CLIENT%)", 1, true) then
                     meta.Scope = "Client-Sided"
                 end
                 CommandMeta[meta.Name:lower()] = meta
@@ -13509,7 +13513,7 @@ do
     }
 
     local function computeScope(meta)
-        if meta.Scope == "Client-Sided" and meta.RawName:upper():find("(CLIENT)",1,true) then
+        if meta.Scope == "Client-Sided" and meta.RawName:upper():find("%(CLIENT%)",1,true) then
             return "Client-Sided"
         end
         local n = meta.Name:lower()
