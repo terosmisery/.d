@@ -1,13 +1,25 @@
 --[[
     IncognoL's Convenient Menu
     v1.0
+    Roblox-style Luau command menu
 
-    Square / old-school Roblox-inspired UI
+    Main sections:
+        All Commands
+        Player
+        Client-Sided
+        Server-Sided
+
+    CLI:
+        /help
+        /clear
+        ;command
+        /command
 ]]
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -24,11 +36,11 @@ local CONFIG = {
     Height = 430,
 
     Background = Color3.fromRGB(11, 11, 11),
-    Panel = Color3.fromRGB(16, 16, 16),
-    PanelHover = Color3.fromRGB(25, 25, 25),
+    Panel = Color3.fromRGB(17, 17, 17),
+    PanelHover = Color3.fromRGB(27, 27, 27),
 
-    Border = Color3.fromRGB(52, 52, 52),
-    BorderHover = Color3.fromRGB(78, 78, 78),
+    Border = Color3.fromRGB(55, 55, 55),
+    BorderHover = Color3.fromRGB(82, 82, 82),
 
     Text = Color3.fromRGB(225, 225, 225),
     SubText = Color3.fromRGB(145, 145, 145),
@@ -37,32 +49,23 @@ local CONFIG = {
 }
 
 --==================================================
--- COMMAND DATABASE
+-- STATE
 --==================================================
 
--- Put your real commands here.
---
--- Category:
---     Player
---
--- Side:
---     Client-Sided
---     Server-Sided
+local MenuOpen = true
+local MenuMinimized = false
 
-local Commands = {
+local FlyEnabled = false
+local NoclipEnabled = false
+local SpinEnabled = false
 
-    {
-        Name = "example",
-        Description = "Example command.",
-        Category = "Player",
-        Side = "Client-Sided",
+local FlyConnection
+local NoclipConnection
+local SpinConnection
 
-        Execute = function(args)
-            print("Example executed", args)
-        end,
-    },
-
-}
+local SavedWalkSpeed = 16
+local SavedJumpPower = 50
+local SavedGravity = workspace.Gravity
 
 --==================================================
 -- GUI
@@ -75,7 +78,7 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = PlayerGui
 
 --==================================================
--- MAIN
+-- MAIN WINDOW
 --==================================================
 
 local Main = Instance.new("Frame")
@@ -86,6 +89,7 @@ Main.AnchorPoint = Vector2.new(0.5, 0.5)
 Main.BackgroundColor3 = CONFIG.Background
 Main.BorderSizePixel = 1
 Main.BorderColor3 = CONFIG.Border
+Main.Visible = true
 Main.Parent = ScreenGui
 
 --==================================================
@@ -111,7 +115,8 @@ TopBarLine.Parent = TopBar
 --==================================================
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -180, 1, 0)
+Title.Name = "Title"
+Title.Size = UDim2.new(1, -115, 1, 0)
 Title.Position = UDim2.fromOffset(9, 0)
 Title.BackgroundTransparency = 1
 Title.Text = CONFIG.Name
@@ -126,8 +131,9 @@ Title.Parent = TopBar
 --==================================================
 
 local Version = Instance.new("TextLabel")
-Version.Size = UDim2.fromOffset(45, 36)
-Version.Position = UDim2.new(1, -105, 0, 0)
+Version.Name = "Version"
+Version.Size = UDim2.fromOffset(42, 36)
+Version.Position = UDim2.new(1, -112, 0, 0)
 Version.BackgroundTransparency = 1
 Version.Text = CONFIG.Version
 Version.TextColor3 = CONFIG.SubText
@@ -137,115 +143,41 @@ Version.TextXAlignment = Enum.TextXAlignment.Right
 Version.Parent = TopBar
 
 --==================================================
--- NEON STATUS DOT
+-- MINIMIZE BUTTON
 --==================================================
 
-local StatusHolder = Instance.new("Frame")
-StatusHolder.Name = "Status"
-StatusHolder.Size = UDim2.fromOffset(18, 18)
-StatusHolder.Position = UDim2.new(1, -58, 0, 9)
-StatusHolder.BackgroundTransparency = 1
-StatusHolder.Parent = TopBar
+local Minimize = Instance.new("TextButton")
+Minimize.Name = "Minimize"
+Minimize.Size = UDim2.fromOffset(27, 27)
+Minimize.Position = UDim2.new(1, -65, 0, 4)
+Minimize.BackgroundColor3 = CONFIG.Panel
+Minimize.BorderSizePixel = 1
+Minimize.BorderColor3 = CONFIG.Border
+Minimize.Text = "_"
+Minimize.TextColor3 = CONFIG.SubText
+Minimize.TextSize = 13
+Minimize.Font = Enum.Font.Code
+Minimize.AutoButtonColor = false
+Minimize.Parent = TopBar
 
-local StatusDot = Instance.new("Frame")
-StatusDot.Name = "Dot"
-StatusDot.Size = UDim2.fromOffset(8, 8)
-StatusDot.Position = UDim2.fromScale(0.5, 0.5)
-StatusDot.AnchorPoint = Vector2.new(0.5, 0.5)
-StatusDot.BackgroundColor3 = Color3.fromRGB(40, 255, 100)
-StatusDot.BorderSizePixel = 0
-StatusDot.Parent = StatusHolder
+Minimize.MouseEnter:Connect(function()
+    Minimize.BackgroundColor3 = CONFIG.PanelHover
+    Minimize.BorderColor3 = CONFIG.BorderHover
+end)
 
-local DotCorner = Instance.new("UICorner")
-DotCorner.CornerRadius = UDim.new(1, 0)
-DotCorner.Parent = StatusDot
-
-local DotStroke = Instance.new("UIStroke")
-DotStroke.Thickness = 2
-DotStroke.Transparency = 0.15
-DotStroke.Color = StatusDot.BackgroundColor3
-DotStroke.Parent = StatusDot
-
--- Smooth green -> purple -> green
-task.spawn(function()
-
-    local green = Color3.fromRGB(40, 255, 100)
-    local purple = Color3.fromRGB(190, 70, 255)
-
-    while ScreenGui.Parent do
-
-        local toPurple = TweenService:Create(
-            StatusDot,
-            TweenInfo.new(
-                2.4,
-                Enum.EasingStyle.Sine,
-                Enum.EasingDirection.InOut
-            ),
-            {
-                BackgroundColor3 = purple
-            }
-        )
-
-        local strokePurple = TweenService:Create(
-            DotStroke,
-            TweenInfo.new(
-                2.4,
-                Enum.EasingStyle.Sine,
-                Enum.EasingDirection.InOut
-            ),
-            {
-                Color = purple
-            }
-        )
-
-        toPurple:Play()
-        strokePurple:Play()
-
-        toPurple.Completed:Wait()
-
-        if not ScreenGui.Parent then
-            break
-        end
-
-        local toGreen = TweenService:Create(
-            StatusDot,
-            TweenInfo.new(
-                2.4,
-                Enum.EasingStyle.Sine,
-                Enum.EasingDirection.InOut
-            ),
-            {
-                BackgroundColor3 = green
-            }
-        )
-
-        local strokeGreen = TweenService:Create(
-            DotStroke,
-            TweenInfo.new(
-                2.4,
-                Enum.EasingStyle.Sine,
-                Enum.EasingDirection.InOut
-            ),
-            {
-                Color = green
-            }
-        )
-
-        toGreen:Play()
-        strokeGreen:Play()
-
-        toGreen.Completed:Wait()
-    end
+Minimize.MouseLeave:Connect(function()
+    Minimize.BackgroundColor3 = CONFIG.Panel
+    Minimize.BorderColor3 = CONFIG.Border
 end)
 
 --==================================================
--- CLOSE
+-- CLOSE BUTTON
 --==================================================
 
 local Close = Instance.new("TextButton")
 Close.Name = "Close"
 Close.Size = UDim2.fromOffset(27, 27)
-Close.Position = UDim2.new(1, -31, 0, 4)
+Close.Position = UDim2.new(1, -33, 0, 4)
 Close.BackgroundColor3 = CONFIG.Panel
 Close.BorderSizePixel = 1
 Close.BorderColor3 = CONFIG.Border
@@ -258,16 +190,47 @@ Close.Parent = TopBar
 
 Close.MouseEnter:Connect(function()
     Close.BackgroundColor3 = Color3.fromRGB(45, 25, 25)
-    Close.TextColor3 = Color3.fromRGB(255, 115, 115)
+    Close.BorderColor3 = Color3.fromRGB(110, 55, 55)
+    Close.TextColor3 = Color3.fromRGB(255, 120, 120)
 end)
 
 Close.MouseLeave:Connect(function()
     Close.BackgroundColor3 = CONFIG.Panel
+    Close.BorderColor3 = CONFIG.Border
     Close.TextColor3 = CONFIG.SubText
 end)
 
 Close.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
+end)
+
+--==================================================
+-- SCREEN TOGGLE BUTTON
+--==================================================
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.fromOffset(76, 28)
+ToggleButton.Position = UDim2.fromOffset(10, 10)
+ToggleButton.BackgroundColor3 = CONFIG.Panel
+ToggleButton.BorderSizePixel = 1
+ToggleButton.BorderColor3 = CONFIG.Border
+ToggleButton.Text = "MENU"
+ToggleButton.TextColor3 = CONFIG.Text
+ToggleButton.TextSize = 12
+ToggleButton.Font = Enum.Font.Code
+ToggleButton.AutoButtonColor = false
+ToggleButton.Visible = true
+ToggleButton.Parent = ScreenGui
+
+ToggleButton.MouseEnter:Connect(function()
+    ToggleButton.BackgroundColor3 = CONFIG.PanelHover
+    ToggleButton.BorderColor3 = CONFIG.BorderHover
+end)
+
+ToggleButton.MouseLeave:Connect(function()
+    ToggleButton.BackgroundColor3 = CONFIG.Panel
+    ToggleButton.BorderColor3 = CONFIG.Border
 end)
 
 --==================================================
@@ -316,6 +279,7 @@ UserInputService.InputChanged:Connect(function(input)
         startPosition.Y.Scale,
         startPosition.Y.Offset + delta.Y
     )
+
 end)
 
 --==================================================
@@ -330,21 +294,857 @@ Content.BackgroundTransparency = 1
 Content.Parent = Main
 
 --==================================================
--- FUNCTION DECLARATIONS
+-- HELPERS
 --==================================================
 
-local showHome
-local showCategories
-local showCommands
-local showCLI
+local function getCharacter(player)
+    if not player then
+        return nil
+    end
+
+    return player.Character
+end
+
+local function getHumanoid(player)
+    local character = getCharacter(player)
+
+    if not character then
+        return nil
+    end
+
+    return character:FindFirstChildOfClass("Humanoid")
+end
+
+local function getRoot(player)
+    local character = getCharacter(player)
+
+    if not character then
+        return nil
+    end
+
+    return character:FindFirstChild("HumanoidRootPart")
+end
+
+local function findPlayer(query)
+
+    if not query then
+        return nil
+    end
+
+    query = tostring(query):lower()
+
+    if query == "me" then
+        return LocalPlayer
+    end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+
+        if player.Name:lower() == query
+            or player.DisplayName:lower() == query then
+
+            return player
+        end
+    end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+
+        if player.Name:lower():sub(1, #query) == query
+            or player.DisplayName:lower():sub(1, #query) == query then
+
+            return player
+        end
+    end
+
+    return nil
+end
+
+local function getTargets(selector)
+
+    selector = selector and tostring(selector):lower() or "me"
+
+    if selector == "me" then
+        return {LocalPlayer}
+    end
+
+    if selector == "all" then
+        return Players:GetPlayers()
+    end
+
+    if selector == "others" then
+
+        local targets = {}
+
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                table.insert(targets, player)
+            end
+        end
+
+        return targets
+    end
+
+    if selector == "random" then
+
+        local players = Players:GetPlayers()
+
+        if #players == 0 then
+            return {}
+        end
+
+        return {players[math.random(1, #players)]}
+    end
+
+    local player = findPlayer(selector)
+
+    if player then
+        return {player}
+    end
+
+    return {}
+end
+
+local function getNumber(value, default)
+    local n = tonumber(value)
+    return n or default
+end
+
+local function resetCharacter()
+
+    local humanoid = getHumanoid(LocalPlayer)
+
+    if humanoid then
+        humanoid.Health = 0
+    end
+
+end
 
 --==================================================
--- BUTTON FACTORY
+-- PLAYER PHYSICS / PLAYER COMMANDS
+-- ALL OF THESE ARE IN PLAYER
 --==================================================
 
-local function createButton(parent, text, size, position)
+local Commands = {
+
+    --==================================================
+    -- PLAYER
+    --==================================================
+
+    {
+        Name = "speed",
+        Aliases = {"walkspeed", "ws"},
+        Description = "Changes walk speed.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+            local speed = getNumber(args[2], 16)
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid.WalkSpeed = speed
+                end
+
+            end
+
+            return "WalkSpeed set to " .. tostring(speed)
+        end,
+    },
+
+    {
+        Name = "jumppower",
+        Aliases = {"jp", "jumpheight"},
+        Description = "Changes jump power.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+            local power = getNumber(args[2], 50)
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+
+                    if humanoid.UseJumpPower ~= nil then
+                        humanoid.UseJumpPower = true
+                    end
+
+                    humanoid.JumpPower = power
+                end
+            end
+
+            return "JumpPower set to " .. tostring(power)
+        end,
+    },
+
+    {
+        Name = "gravity",
+        Aliases = {"grav"},
+        Description = "Changes workspace gravity.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local gravity = getNumber(args[1], 196.2)
+
+            workspace.Gravity = gravity
+
+            return "Gravity set to " .. tostring(gravity)
+        end,
+    },
+
+    {
+        Name = "jump",
+        Aliases = {},
+        Description = "Makes a player jump.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid.Jump = true
+                end
+
+            end
+
+            return "Jump triggered."
+        end,
+    },
+
+    {
+        Name = "sit",
+        Aliases = {},
+        Description = "Makes a player sit.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid.Sit = true
+                end
+
+            end
+
+            return "Sit triggered."
+        end,
+    },
+
+    {
+        Name = "platformstand",
+        Aliases = {"platform"},
+        Description = "Enables PlatformStand.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid.PlatformStand = true
+                end
+
+            end
+
+            return "PlatformStand enabled."
+        end,
+    },
+
+    {
+        Name = "unplatformstand",
+        Aliases = {"unplatform"},
+        Description = "Disables PlatformStand.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid.PlatformStand = false
+                end
+
+            end
+
+            return "PlatformStand disabled."
+        end,
+    },
+
+    {
+        Name = "freeze",
+        Aliases = {},
+        Description = "Freezes a player's root part.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local root = getRoot(player)
+
+                if root then
+                    root.Anchored = true
+                end
+
+            end
+
+            return "Target(s) frozen."
+        end,
+    },
+
+    {
+        Name = "unfreeze",
+        Aliases = {},
+        Description = "Unfreezes a player's root part.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local root = getRoot(player)
+
+                if root then
+                    root.Anchored = false
+                end
+
+            end
+
+            return "Target(s) unfrozen."
+        end,
+    },
+
+    {
+        Name = "respawn",
+        Aliases = {"reset"},
+        Description = "Respawns the target player.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid.Health = 0
+                end
+
+            end
+
+            return "Respawn requested."
+        end,
+    },
+
+    {
+        Name = "noclip",
+        Aliases = {"nc"},
+        Description = "Disables character collisions.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local target = args[1] or "me"
+
+            if target ~= "me" and findPlayer(target) ~= LocalPlayer then
+                return "Noclip is local-only."
+            end
+
+            NoclipEnabled = true
+
+            if NoclipConnection then
+                NoclipConnection:Disconnect()
+            end
+
+            NoclipConnection = RunService.Stepped:Connect(function()
+
+                if not NoclipEnabled then
+                    return
+                end
+
+                local character = LocalPlayer.Character
+
+                if not character then
+                    return
+                end
+
+                for _, part in ipairs(character:GetDescendants()) do
+
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+
+                end
+            end)
+
+            return "Noclip enabled."
+        end,
+    },
+
+    {
+        Name = "clip",
+        Aliases = {},
+        Description = "Restores character collisions.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            NoclipEnabled = false
+
+            if NoclipConnection then
+                NoclipConnection:Disconnect()
+                NoclipConnection = nil
+            end
+
+            local character = LocalPlayer.Character
+
+            if character then
+
+                for _, part in ipairs(character:GetDescendants()) do
+
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+
+                end
+            end
+
+            return "Noclip disabled."
+        end,
+    },
+
+    {
+        Name = "fly",
+        Aliases = {},
+        Description = "Enables flight.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            if FlyEnabled then
+                return "Fly is already enabled."
+            end
+
+            FlyEnabled = true
+
+            local character = LocalPlayer.Character
+            local root = getRoot(LocalPlayer)
+
+            if not character or not root then
+                FlyEnabled = false
+                return "Character unavailable."
+            end
+
+            local bodyVelocity = Instance.new("BodyVelocity")
+            bodyVelocity.Name = "IncognolsFlyVelocity"
+            bodyVelocity.MaxForce = Vector3.new(
+                math.huge,
+                math.huge,
+                math.huge
+            )
+            bodyVelocity.Velocity = Vector3.zero
+            bodyVelocity.Parent = root
+
+            FlyConnection = RunService.RenderStepped:Connect(function()
+
+                if not FlyEnabled then
+                    return
+                end
+
+                local currentRoot = getRoot(LocalPlayer)
+
+                if not currentRoot or not bodyVelocity.Parent then
+                    return
+                end
+
+                local camera = workspace.CurrentCamera
+
+                if not camera then
+                    return
+                end
+
+                local direction = Vector3.zero
+
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                    direction += camera.CFrame.LookVector
+                end
+
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                    direction -= camera.CFrame.LookVector
+                end
+
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                    direction += camera.CFrame.RightVector
+                end
+
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                    direction -= camera.CFrame.RightVector
+                end
+
+                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                    direction += Vector3.yAxis
+                end
+
+                if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                    direction -= Vector3.yAxis
+                end
+
+                if direction.Magnitude > 0 then
+                    direction = direction.Unit * 50
+                else
+                    direction = Vector3.zero
+                end
+
+                bodyVelocity.Velocity = direction
+            end)
+
+            return "Fly enabled."
+        end,
+    },
+
+    {
+        Name = "unfly",
+        Aliases = {},
+        Description = "Disables flight.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            FlyEnabled = false
+
+            if FlyConnection then
+                FlyConnection:Disconnect()
+                FlyConnection = nil
+            end
+
+            local root = getRoot(LocalPlayer)
+
+            if root then
+
+                local existing =
+                    root:FindFirstChild("IncognolsFlyVelocity")
+
+                if existing then
+                    existing:Destroy()
+                end
+            end
+
+            return "Fly disabled."
+        end,
+    },
+
+    {
+        Name = "spin",
+        Aliases = {},
+        Description = "Spins the local character.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            if SpinEnabled then
+                return "Spin is already enabled."
+            end
+
+            SpinEnabled = true
+
+            local speed = getNumber(args[1], 15)
+
+            SpinConnection = RunService.RenderStepped:Connect(function(dt)
+
+                if not SpinEnabled then
+                    return
+                end
+
+                local root = getRoot(LocalPlayer)
+
+                if root then
+                    root.CFrame =
+                        root.CFrame
+                        * CFrame.Angles(0, math.rad(speed) * dt, 0)
+                end
+            end)
+
+            return "Spin enabled."
+        end,
+    },
+
+    {
+        Name = "unspin",
+        Aliases = {},
+        Description = "Stops spinning.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            SpinEnabled = false
+
+            if SpinConnection then
+                SpinConnection:Disconnect()
+                SpinConnection = nil
+            end
+
+            return "Spin disabled."
+        end,
+    },
+
+    {
+        Name = "freefall",
+        Aliases = {},
+        Description = "Forces the Humanoid into Freefall.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+                end
+
+            end
+
+            return "Freefall triggered."
+        end,
+    },
+
+    {
+        Name = "tp",
+        Aliases = {"teleport"},
+        Description = "Teleports you to a player.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local target = findPlayer(args[1])
+
+            if not target then
+                return "Player not found."
+            end
+
+            local myRoot = getRoot(LocalPlayer)
+            local targetRoot = getRoot(target)
+
+            if not myRoot or not targetRoot then
+                return "Character unavailable."
+            end
+
+            myRoot.CFrame = targetRoot.CFrame
+
+            return "Teleported to " .. target.Name .. "."
+        end,
+    },
+
+    {
+        Name = "goto",
+        Aliases = {},
+        Description = "Teleports you to a player.",
+        Category = "Player",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local target = findPlayer(args[1])
+
+            if not target then
+                return "Player not found."
+            end
+
+            local myRoot = getRoot(LocalPlayer)
+            local targetRoot = getRoot(target)
+
+            if not myRoot or not targetRoot then
+                return "Character unavailable."
+            end
+
+            myRoot.CFrame = targetRoot.CFrame
+
+            return "Teleported to " .. target.Name .. "."
+        end,
+    },
+
+    {
+        Name = "bring",
+        Aliases = {},
+        Description = "Attempts to bring a player to you.",
+        Category = "Player",
+        Side = "Server-Sided",
+
+        Execute = function(args)
+
+            local target = findPlayer(args[1])
+
+            if not target then
+                return "Player not found."
+            end
+
+            local myRoot = getRoot(LocalPlayer)
+            local targetRoot = getRoot(target)
+
+            if not myRoot or not targetRoot then
+                return "Character unavailable."
+            end
+
+            targetRoot.CFrame = myRoot.CFrame
+
+            return "Bring requested for " .. target.Name .. "."
+        end,
+    },
+
+    --==================================================
+    -- CLIENT-SIDED
+    --==================================================
+
+    {
+        Name = "rejoin",
+        Aliases = {"reconnect"},
+        Description = "Reconnects to the current place.",
+        Category = "Client-Sided",
+        Side = "Client-Sided",
+
+        Execute = function(args)
+
+            local TeleportService = game:GetService("TeleportService")
+
+            local success, err = pcall(function()
+                TeleportService:Teleport(game.PlaceId, LocalPlayer)
+            end)
+
+            if not success then
+                return "Rejoin failed: " .. tostring(err)
+            end
+
+            return "Rejoining..."
+        end,
+    },
+
+    --==================================================
+    -- SERVER-SIDED
+    --==================================================
+
+    {
+        Name = "kill",
+        Aliases = {"die"},
+        Description = "Kills the target player.",
+        Category = "Server-Sided",
+        Side = "Server-Sided",
+
+        Execute = function(args)
+
+            local targets = getTargets(args[1])
+
+            for _, player in ipairs(targets) do
+
+                local humanoid = getHumanoid(player)
+
+                if humanoid then
+                    humanoid.Health = 0
+                end
+
+            end
+
+            return "Kill requested."
+        end,
+    },
+
+}
+
+--==================================================
+-- COMMAND LOOKUP
+--==================================================
+
+local function findCommand(name)
+
+    name = tostring(name):lower()
+
+    for _, command in ipairs(Commands) do
+
+        if command.Name:lower() == name then
+            return command
+        end
+
+        for _, alias in ipairs(command.Aliases or {}) do
+
+            if alias:lower() == name then
+                return command
+            end
+
+        end
+    end
+
+    return nil
+end
+
+--==================================================
+-- MAIN PAGE SYSTEM
+--==================================================
+
+local CurrentPage = nil
+
+local function clearContent()
+
+    for _, child in ipairs(Content:GetChildren()) do
+        child:Destroy()
+    end
+
+end
+
+local function makeButton(parent, text, size, position)
 
     local button = Instance.new("TextButton")
+
     button.Size = size
     button.Position = position
     button.BackgroundColor3 = CONFIG.Panel
@@ -370,25 +1170,10 @@ local function createButton(parent, text, size, position)
     return button
 end
 
---==================================================
--- CLEAR CONTENT
---==================================================
-
-local function clearContent()
-
-    for _, child in ipairs(Content:GetChildren()) do
-        child:Destroy()
-    end
-
-end
-
---==================================================
--- PAGE TITLE
---==================================================
-
 local function createTitle(text)
 
     local label = Instance.new("TextLabel")
+
     label.Size = UDim2.new(1, -10, 0, 25)
     label.Position = UDim2.fromOffset(5, 2)
     label.BackgroundTransparency = 1
@@ -403,44 +1188,51 @@ local function createTitle(text)
 end
 
 --==================================================
--- HOME
+-- CATEGORY BUTTONS
 --==================================================
+
+local showHome
+local showCategories
+local showCommands
+local showCLI
 
 showHome = function()
 
     clearContent()
+    CurrentPage = "Home"
 
-    local help = createButton(
+    local helpButton = makeButton(
         Content,
         "HELP",
-        UDim2.fromOffset(190, 48),
-        UDim2.new(0.5, -195, 0.5, -24)
+        UDim2.fromOffset(200, 48),
+        UDim2.new(0.5, -205, 0.5, -24)
     )
 
-    local cli = createButton(
+    local cliButton = makeButton(
         Content,
         "COMMAND LINE INTERFACE",
-        UDim2.fromOffset(190, 48),
+        UDim2.fromOffset(200, 48),
         UDim2.new(0.5, 5, 0.5, -24)
     )
 
-    help.MouseButton1Click:Connect(function()
+    helpButton.MouseButton1Click:Connect(function()
         showCategories()
     end)
 
-    cli.MouseButton1Click:Connect(function()
+    cliButton.MouseButton1Click:Connect(function()
         showCLI()
     end)
 
 end
 
 --==================================================
--- HELP / CATEGORIES
+-- HELP
 --==================================================
 
 showCategories = function()
 
     clearContent()
+    CurrentPage = "Help"
 
     createTitle("HELP")
 
@@ -448,7 +1240,7 @@ showCategories = function()
     info.Size = UDim2.new(1, -10, 0, 20)
     info.Position = UDim2.fromOffset(5, 30)
     info.BackgroundTransparency = 1
-    info.Text = "Select a command category."
+    info.Text = "Select a command section."
     info.TextColor3 = CONFIG.SubText
     info.TextSize = 11
     info.Font = Enum.Font.Code
@@ -462,28 +1254,29 @@ showCategories = function()
         "Server-Sided",
     }
 
-    local startY = 60
+    local y = 60
 
-    for index, category in ipairs(categories) do
+    for _, category in ipairs(categories) do
 
-        local button = createButton(
+        local button = makeButton(
             Content,
             category,
             UDim2.new(1, -10, 0, 38),
-            UDim2.fromOffset(5, startY + ((index - 1) * 43))
+            UDim2.fromOffset(5, y)
         )
 
         button.MouseButton1Click:Connect(function()
             showCommands(category)
         end)
 
+        y += 43
     end
 
-    local back = createButton(
+    local back = makeButton(
         Content,
         "< Back",
         UDim2.fromOffset(70, 30),
-        UDim2.fromOffset(5, 252)
+        UDim2.fromOffset(5, y + 8)
     )
 
     back.MouseButton1Click:Connect(function()
@@ -493,14 +1286,15 @@ showCategories = function()
 end
 
 --==================================================
--- COMMANDS
+-- COMMAND PAGE
 --==================================================
 
 showCommands = function(category)
 
     clearContent()
+    CurrentPage = category
 
-    local back = createButton(
+    local back = makeButton(
         Content,
         "< Back",
         UDim2.fromOffset(70, 28),
@@ -522,29 +1316,29 @@ showCommands = function(category)
     heading.TextXAlignment = Enum.TextXAlignment.Left
     heading.Parent = Content
 
-    local search
+    local searchBox = nil
 
     if category == "All Commands" then
 
-        search = Instance.new("TextBox")
-        search.Size = UDim2.new(1, -10, 0, 30)
-        search.Position = UDim2.fromOffset(5, 36)
-        search.BackgroundColor3 = CONFIG.Panel
-        search.BorderSizePixel = 1
-        search.BorderColor3 = CONFIG.Border
-        search.Text = ""
-        search.PlaceholderText = "Search commands..."
-        search.PlaceholderColor3 = CONFIG.SubText
-        search.TextColor3 = CONFIG.Text
-        search.TextSize = 12
-        search.Font = Enum.Font.Code
-        search.ClearTextOnFocus = false
-        search.TextXAlignment = Enum.TextXAlignment.Left
-        search.Parent = Content
+        searchBox = Instance.new("TextBox")
+        searchBox.Size = UDim2.new(1, -10, 0, 30)
+        searchBox.Position = UDim2.fromOffset(5, 36)
+        searchBox.BackgroundColor3 = CONFIG.Panel
+        searchBox.BorderSizePixel = 1
+        searchBox.BorderColor3 = CONFIG.Border
+        searchBox.Text = ""
+        searchBox.PlaceholderText = "Search commands..."
+        searchBox.PlaceholderColor3 = CONFIG.SubText
+        searchBox.TextColor3 = CONFIG.Text
+        searchBox.TextSize = 12
+        searchBox.Font = Enum.Font.Code
+        searchBox.ClearTextOnFocus = false
+        searchBox.TextXAlignment = Enum.TextXAlignment.Left
+        searchBox.Parent = Content
 
         local padding = Instance.new("UIPadding")
         padding.PaddingLeft = UDim.new(0, 8)
-        padding.Parent = search
+        padding.Parent = searchBox
     end
 
     local listTop = category == "All Commands" and 72 or 38
@@ -568,15 +1362,17 @@ showCommands = function(category)
     local function refresh()
 
         for _, child in ipairs(list:GetChildren()) do
+
             if not child:IsA("UIListLayout") then
                 child:Destroy()
             end
+
         end
 
         local query = ""
 
-        if search then
-            query = search.Text:lower()
+        if searchBox then
+            query = searchBox.Text:lower()
         end
 
         local shown = 0
@@ -587,10 +1383,13 @@ showCommands = function(category)
 
             if category == "All Commands" then
                 categoryMatch = true
+
             elseif category == "Player" then
                 categoryMatch = command.Category == "Player"
+
             elseif category == "Client-Sided" then
                 categoryMatch = command.Side == "Client-Sided"
+
             elseif category == "Server-Sided" then
                 categoryMatch = command.Side == "Server-Sided"
             end
@@ -598,68 +1397,74 @@ showCommands = function(category)
             local searchMatch = true
 
             if query ~= "" then
+
                 searchMatch =
                     command.Name:lower():find(query, 1, true) ~= nil
+
             end
 
             if categoryMatch and searchMatch then
 
                 shown += 1
 
-                local button = Instance.new("TextButton")
-                button.Size = UDim2.new(1, -5, 0, 48)
-                button.BackgroundColor3 = CONFIG.Panel
-                button.BorderSizePixel = 1
-                button.BorderColor3 = CONFIG.Border
-                button.Text = ""
-                button.AutoButtonColor = false
-                button.Parent = list
+                local entry = Instance.new("TextButton")
+                entry.Size = UDim2.new(1, -5, 0, 52)
+                entry.BackgroundColor3 = CONFIG.Panel
+                entry.BorderSizePixel = 1
+                entry.BorderColor3 = CONFIG.Border
+                entry.Text = ""
+                entry.AutoButtonColor = false
+                entry.Parent = list
 
                 local name = Instance.new("TextLabel")
                 name.Size = UDim2.new(1, -14, 0, 20)
                 name.Position = UDim2.fromOffset(7, 3)
                 name.BackgroundTransparency = 1
-                name.Text = "/" .. command.Name
+                name.Text = ";" .. command.Name
                 name.TextColor3 = CONFIG.Accent
                 name.TextSize = 13
                 name.Font = Enum.Font.Code
                 name.TextXAlignment = Enum.TextXAlignment.Left
-                name.Parent = button
+                name.Parent = entry
 
-                local description = Instance.new("TextLabel")
-                description.Size = UDim2.new(1, -14, 0, 19)
-                description.Position = UDim2.fromOffset(7, 24)
-                description.BackgroundTransparency = 1
-                description.Text = command.Description or ""
-                description.TextColor3 = CONFIG.SubText
-                description.TextSize = 11
-                description.Font = Enum.Font.Code
-                description.TextXAlignment = Enum.TextXAlignment.Left
-                description.Parent = button
+                local desc = Instance.new("TextLabel")
+                desc.Size = UDim2.new(1, -14, 0, 20)
+                desc.Position = UDim2.fromOffset(7, 25)
+                desc.BackgroundTransparency = 1
+                desc.Text = command.Description or ""
+                desc.TextColor3 = CONFIG.SubText
+                desc.TextSize = 11
+                desc.Font = Enum.Font.Code
+                desc.TextXAlignment = Enum.TextXAlignment.Left
+                desc.Parent = entry
 
-                button.MouseEnter:Connect(function()
-                    button.BackgroundColor3 = CONFIG.PanelHover
+                entry.MouseEnter:Connect(function()
+                    entry.BackgroundColor3 = CONFIG.PanelHover
                 end)
 
-                button.MouseLeave:Connect(function()
-                    button.BackgroundColor3 = CONFIG.Panel
+                entry.MouseLeave:Connect(function()
+                    entry.BackgroundColor3 = CONFIG.Panel
                 end)
 
-                button.MouseButton1Click:Connect(function()
+                entry.MouseButton1Click:Connect(function()
+                    if CurrentPage ~= "Command Line Interface" then
+                        showCLI()
 
-                    if not command.Execute then
-                        return
+                        task.defer(function()
+
+                            if _G.IncognoLCLIInput then
+                                _G.IncognoLCLIInput.Text = ";" .. command.Name .. " "
+                                _G.IncognoLCLIInput:CaptureFocus()
+                                _G.IncognoLCLIInput.CursorPosition =
+                                    #_G.IncognoLCLIInput.Text + 1
+                            end
+
+                        end)
                     end
-
-                    local success, result = pcall(function()
-                        return command.Execute({})
-                    end)
-
-                    if not success then
-                        warn(result)
-                    end
                 end)
+
             end
+
         end
 
         if shown == 0 then
@@ -677,30 +1482,38 @@ showCommands = function(category)
         end
 
         task.defer(function()
+
             list.CanvasSize = UDim2.fromOffset(
                 0,
                 layout.AbsoluteContentSize.Y + 5
             )
+
         end)
+
     end
 
     refresh()
 
-    if search then
-        search:GetPropertyChangedSignal("Text"):Connect(refresh)
+    if searchBox then
+
+        searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+            refresh()
+        end)
+
     end
 
 end
 
 --==================================================
--- COMMAND LINE INTERFACE
+-- CLI
 --==================================================
 
 showCLI = function()
 
     clearContent()
+    CurrentPage = "CLI"
 
-    local back = createButton(
+    local back = makeButton(
         Content,
         "< Back",
         UDim2.fromOffset(70, 28),
@@ -722,10 +1535,13 @@ showCLI = function()
     heading.TextXAlignment = Enum.TextXAlignment.Left
     heading.Parent = Content
 
-    -- Console
+    --==================================================
+    -- CONSOLE
+    --==================================================
 
     local console = Instance.new("ScrollingFrame")
-    console.Size = UDim2.new(1, -10, 1, -102)
+    console.Name = "Console"
+    console.Size = UDim2.new(1, -10, 1, -105)
     console.Position = UDim2.fromOffset(5, 38)
     console.BackgroundColor3 = Color3.fromRGB(7, 7, 7)
     console.BorderSizePixel = 1
@@ -757,6 +1573,7 @@ showCLI = function()
         line.Parent = console
 
         task.defer(function()
+
             console.CanvasSize = UDim2.fromOffset(
                 0,
                 consoleLayout.AbsoluteContentSize.Y + 8
@@ -766,19 +1583,25 @@ showCLI = function()
                 0,
                 math.max(0, console.AbsoluteCanvasSize.Y)
             )
+
         end)
+
+        return line
     end
 
-    -- Input
+    --==================================================
+    -- INPUT
+    --==================================================
 
     local input = Instance.new("TextBox")
-    input.Size = UDim2.new(1, -90, 0, 38)
+    input.Name = "CommandInput"
+    input.Size = UDim2.new(1, -175, 0, 38)
     input.Position = UDim2.new(0, 5, 1, -43)
     input.BackgroundColor3 = CONFIG.Panel
     input.BorderSizePixel = 1
     input.BorderColor3 = CONFIG.Border
     input.Text = ""
-    input.PlaceholderText = "Enter command..."
+    input.PlaceholderText = ";command target"
     input.PlaceholderColor3 = CONFIG.SubText
     input.TextColor3 = CONFIG.Text
     input.TextSize = 12
@@ -789,19 +1612,42 @@ showCLI = function()
 
     local inputPadding = Instance.new("UIPadding")
     inputPadding.PaddingLeft = UDim.new(0, 8)
-    input.Parent = Content
+    inputPadding.PaddingRight = UDim.new(0, 8)
     inputPadding.Parent = input
 
-    -- Execute
+    _G.IncognoLCLIInput = input
 
-    local execute = createButton(
+    --==================================================
+    -- EXECUTE
+    --==================================================
+
+    local execute = makeButton(
         Content,
         "EXECUTE",
-        UDim2.fromOffset(80, 38),
-        UDim2.new(1, -85, 1, -43)
+        UDim2.fromOffset(78, 38),
+        UDim2.new(1, -165, 1, -43)
     )
 
+    --==================================================
+    -- CLEAR
+    --==================================================
+
+    local clear = makeButton(
+        Content,
+        "CLEAR",
+        UDim2.fromOffset(78, 38),
+        UDim2.new(1, -82, 1, -43)
+    )
+
+    --==================================================
+    -- COMMAND EXECUTOR
+    --==================================================
+
     local function executeCommand(text)
+
+        text = tostring(text)
+
+        text = text:match("^%s*(.-)%s*$") or ""
 
         if text == "" then
             return
@@ -811,9 +1657,11 @@ showCLI = function()
 
         local clean = text
 
-        if clean:sub(1, 1) == "/" then
+        if clean:sub(1, 1) == ";" or clean:sub(1, 1) == "/" then
             clean = clean:sub(2)
         end
+
+        clean = clean:match("^%s*(.-)%s*$") or ""
 
         local args = {}
 
@@ -829,77 +1677,254 @@ showCLI = function()
 
         table.remove(args, 1)
 
-        local found
+        --==============================================
+        -- HELP
+        --==============================================
 
-        for _, command in ipairs(Commands) do
+        if commandName:lower() == "help" then
 
-            if command.Name:lower() == commandName:lower() then
-                found = command
-                break
+            printLine("")
+            printLine("===== ALL COMMANDS =====")
+
+            for _, command in ipairs(Commands) do
+                printLine(
+                    ";" .. command.Name
+                    .. " - "
+                    .. (command.Description or "")
+                )
             end
 
-        end
+            printLine("")
+            printLine("===== PLAYER =====")
 
-        if not found then
-            printLine("Unknown command: " .. commandName)
+            for _, command in ipairs(Commands) do
+
+                if command.Category == "Player" then
+
+                    printLine(
+                        ";" .. command.Name
+                        .. " - "
+                        .. (command.Description or "")
+                    )
+
+                end
+            end
+
+            printLine("")
+            printLine("===== CLIENT-SIDED =====")
+
+            for _, command in ipairs(Commands) do
+
+                if command.Side == "Client-Sided" then
+
+                    printLine(
+                        ";" .. command.Name
+                        .. " - "
+                        .. (command.Description or "")
+                    )
+
+                end
+            end
+
+            printLine("")
+            printLine("===== SERVER-SIDED =====")
+
+            for _, command in ipairs(Commands) do
+
+                if command.Side == "Server-Sided" then
+
+                    printLine(
+                        ";" .. command.Name
+                        .. " - "
+                        .. (command.Description or "")
+                    )
+
+                end
+            end
+
             return
         end
 
-        if not found.Execute then
-            printLine("Command has no implementation.")
+        --==============================================
+        -- CLEAR
+        --==============================================
+
+        if commandName:lower() == "clear" then
+
+            for _, child in ipairs(console:GetChildren()) do
+
+                if child:IsA("TextLabel") then
+                    child:Destroy()
+                end
+
+            end
+
             return
         end
+
+        --==============================================
+        -- COMMAND LOOKUP
+        --==============================================
+
+        local command = findCommand(commandName)
+
+        if not command then
+
+            printLine(
+                "Unknown command: "
+                .. tostring(commandName)
+            )
+
+            printLine("Type ;help to see commands.")
+
+            return
+        end
+
+        --==============================================
+        -- EXECUTE
+        --==============================================
 
         local success, result = pcall(function()
-            return found.Execute(args)
+
+            return command.Execute(args)
+
         end)
 
         if not success then
-            printLine("Error: " .. tostring(result))
+
+            printLine(
+                "Error: "
+                .. tostring(result)
+            )
+
         elseif result ~= nil then
+
             printLine(tostring(result))
+
         else
-            printLine("Executed /" .. found.Name)
+
+            printLine(
+                "Executed ;"
+                .. command.Name
+            )
+
         end
+
     end
+
+    --==================================================
+    -- BUTTONS
+    --==================================================
 
     execute.MouseButton1Click:Connect(function()
 
         local text = input.Text
+
         input.Text = ""
 
         executeCommand(text)
 
     end)
 
+    clear.MouseButton1Click:Connect(function()
+
+        for _, child in ipairs(console:GetChildren()) do
+
+            if child:IsA("TextLabel") then
+                child:Destroy()
+            end
+
+        end
+
+    end)
+
+    --==================================================
+    -- ENTER
+    --==================================================
+
     input.FocusLost:Connect(function(enterPressed)
 
         if enterPressed then
 
             local text = input.Text
+
             input.Text = ""
 
             executeCommand(text)
+
         end
 
     end)
 
+    --==================================================
+    -- CLI STARTUP
+    --==================================================
+
     printLine("IncognoL's Convenient Menu")
     printLine("Command Line Interface ready.")
-    printLine("Type a command and press ENTER.")
+    printLine("Type ;help to list all commands.")
+    printLine("")
 
 end
+
+--==================================================
+-- MINIMIZE
+--==================================================
+
+Minimize.MouseButton1Click:Connect(function()
+
+    MenuMinimized = not MenuMinimized
+
+    Content.Visible = not MenuMinimized
+    TopBarLine.Visible = not MenuMinimized
+
+    if MenuMinimized then
+
+        Main.Size = UDim2.fromOffset(CONFIG.Width, 36)
+        Minimize.Text = "□"
+
+    else
+
+        Main.Size = UDim2.fromOffset(CONFIG.Width, CONFIG.Height)
+        Minimize.Text = "_"
+
+    end
+
+end)
+
+--==================================================
+-- TOGGLE
+--==================================================
+
+ToggleButton.MouseButton1Click:Connect(function()
+
+    if not Main.Parent then
+        return
+    end
+
+    MenuOpen = not MenuOpen
+    Main.Visible = MenuOpen
+
+end)
 
 --==================================================
 -- START
 --==================================================
 
 showHome()
+Main.Visible = true
+ToggleButton.Visible = true
+
+--==================================================
+-- RETURN
+--==================================================
 
 return {
     GUI = ScreenGui,
+    Main = Main,
     Commands = Commands,
     ShowHome = showHome,
-    ShowCategories = showCategories,
+    ShowHelp = showCategories,
+    ShowCommands = showCommands,
     ShowCLI = showCLI,
 }
