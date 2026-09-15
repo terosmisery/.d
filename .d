@@ -105,7 +105,7 @@ SocialService = Services.SocialService
 
 PlayerGui = cloneref(Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui"))
 COREGUI = Services.CoreGui or PlayerGui
-IYMouse = cloneref(Players.LocalPlayer:GetMouse())
+INCMouse = cloneref(Players.LocalPlayer:GetMouse())
 PlaceId, JobId = game.PlaceId, game.JobId
 xpcall(function()
 	IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
@@ -119,18 +119,18 @@ end)) or false]]
 
 -- xylex & europa
 local iyassets = {
-	["infiniteyield/assets/bindsandplugins.png"] = "rbxassetid://5147695474",
-	["infiniteyield/assets/close.png"] = "rbxassetid://5054663650",
-	["infiniteyield/assets/editaliases.png"] = "rbxassetid://5147488658",
-	["infiniteyield/assets/editkeybinds.png"] = "rbxassetid://129697930",
-	["infiniteyield/assets/edittheme.png"] = "rbxassetid://4911962991",
-	["infiniteyield/assets/editwaypoints.png"] = "rbxassetid://5147488592",
-	["infiniteyield/assets/imgstudiopluginlogo.png"] = "rbxassetid://4113050383",
-	["infiniteyield/assets/logo.png"] = "rbxassetid://1352543873",
-	["infiniteyield/assets/minimize.png"] = "rbxassetid://2406617031",
-	["infiniteyield/assets/pin.png"] = "rbxassetid://6234691350",
-	["infiniteyield/assets/reference.png"] = "rbxassetid://3523243755",
-	["infiniteyield/assets/settings.png"] = "rbxassetid://1204397029"
+	["incogno/assets/bindsandplugins.png"] = "rbxassetid://5147695474",
+	["incogno/assets/close.png"] = "rbxassetid://5054663650",
+	["incogno/assets/editaliases.png"] = "rbxassetid://5147488658",
+	["incogno/assets/editkeybinds.png"] = "rbxassetid://129697930",
+	["incogno/assets/edittheme.png"] = "rbxassetid://4911962991",
+	["incogno/assets/editwaypoints.png"] = "rbxassetid://5147488592",
+	["incogno/assets/imgstudiopluginlogo.png"] = "rbxassetid://4113050383",
+	["incogno/assets/logo.png"] = "rbxassetid://1352543873",
+	["incogno/assets/minimize.png"] = "rbxassetid://2406617031",
+	["incogno/assets/pin.png"] = "rbxassetid://6234691350",
+	["incogno/assets/reference.png"] = "rbxassetid://3523243755",
+	["incogno/assets/settings.png"] = "rbxassetid://1204397029"
 }
 
 local function getcustomasset(asset)
@@ -148,18 +148,18 @@ end
 if makefolder and isfolder and writefile and isfile then
 	pcall(function() -- good executor trust
 		local assets = "https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/"
-		for _, folder in {"infiniteyield", "infiniteyield/assets"} do
+		for _, folder in {"incogno", "incogno/assets"} do
 			if not isfolder(folder) then
 				makefolder(folder)
 			end
 		end
 		for path in iyassets do
 			if not isfile(path) then
-				writefile(path, game:HttpGet((path:gsub("infiniteyield/", assets))))
+				writefile(path, game:HttpGet((path:gsub("incogno/", assets))))
 			end
 		end
 		-- honestly just blame your phone if the assets appear in your gallery
-		if IsOnMobile then writefile("infiniteyield/assets/.nomedia", "") end
+		if IsOnMobile then writefile("incogno/assets/.nomedia", "") end
 	end)
 end
 
@@ -351,6 +351,8 @@ ScaledHolder.Size = UDim2.fromScale(1, 1)
 ScaledHolder.BackgroundTransparency = 1
 ScaledHolder.Parent = PARENT
 Scale.Name = randomString()
+-- Keep the legacy backend UI non-visible; the custom INC front-end below is the only visible GUI.
+ScaledHolder.Visible = false
 
 Holder.Name = randomString()
 Holder.Parent = ScaledHolder
@@ -454,7 +456,7 @@ SettingsButton.Parent = Holder
 SettingsButton.BackgroundTransparency = 1
 SettingsButton.Position = UDim2.new(0, 230, 0, 0)
 SettingsButton.Size = UDim2.new(0, 20, 0, 20)
-SettingsButton.Image = getcustomasset("infiniteyield/assets/settings.png")
+SettingsButton.Image = getcustomasset("incogno/assets/settings.png")
 SettingsButton.ZIndex = 10
 
 ReferenceButton = Instance.new("ImageButton")
@@ -463,7 +465,7 @@ ReferenceButton.Parent = Holder
 ReferenceButton.BackgroundTransparency = 1
 ReferenceButton.Position = UDim2.new(0, 212, 0, 2)
 ReferenceButton.Size = UDim2.new(0, 16, 0, 16)
-ReferenceButton.Image = getcustomasset("infiniteyield/assets/reference.png")
+ReferenceButton.Image = getcustomasset("incogno/assets/reference.png")
 ReferenceButton.ZIndex = 10
 
 Settings.Name = "Settings"
@@ -560,19 +562,19 @@ function makeSettingsButton(name,iconID,off)
 	return button
 end
 
-ColorsButton = makeSettingsButton("Edit Theme",getcustomasset("infiniteyield/assets/edittheme.png"))
+ColorsButton = makeSettingsButton("Edit Theme",getcustomasset("incogno/assets/edittheme.png"))
 ColorsButton.Position = UDim2.new(0, 5, 0, 55)
 ColorsButton.Size = UDim2.new(1, -10, 0, 25)
 ColorsButton.Name = "Colors"
 ColorsButton.Parent = SettingsHolder
 
-Keybinds = makeSettingsButton("Edit Keybinds",getcustomasset("infiniteyield/assets/editkeybinds.png"))
+Keybinds = makeSettingsButton("Edit Keybinds",getcustomasset("incogno/assets/editkeybinds.png"))
 Keybinds.Position = UDim2.new(0, 5, 0, 85)
 Keybinds.Size = UDim2.new(1, -10, 0, 25)
 Keybinds.Name = "Keybinds"
 Keybinds.Parent = SettingsHolder
 
-Aliases = makeSettingsButton("Edit Aliases",getcustomasset("infiniteyield/assets/editaliases.png"))
+Aliases = makeSettingsButton("Edit Aliases",getcustomasset("incogno/assets/editaliases.png"))
 Aliases.Position = UDim2.new(0, 5, 0, 115)
 Aliases.Size = UDim2.new(1, -10, 0, 25)
 Aliases.Name = "Aliases"
@@ -616,19 +618,19 @@ On.Text = ""
 On.TextColor3 = Color3.new(0, 0, 0)
 On.ZIndex = 10
 
-Positions = makeSettingsButton("Edit/Goto Waypoints",getcustomasset("infiniteyield/assets/editwaypoints.png"))
+Positions = makeSettingsButton("Edit/Goto Waypoints",getcustomasset("incogno/assets/editwaypoints.png"))
 Positions.Position = UDim2.new(0, 5, 0, 145)
 Positions.Size = UDim2.new(1, -10, 0, 25)
 Positions.Name = "Waypoints"
 Positions.Parent = SettingsHolder
 
-EventBind = makeSettingsButton("Edit Event Binds",getcustomasset("infiniteyield/assets/bindsandplugins.png"),759)
+EventBind = makeSettingsButton("Edit Event Binds",getcustomasset("incogno/assets/bindsandplugins.png"),759)
 EventBind.Position = UDim2.new(0, 5, 0, 205)
 EventBind.Size = UDim2.new(1, -10, 0, 25)
 EventBind.Name = "EventBinds"
 EventBind.Parent = SettingsHolder
 
-Plugins = makeSettingsButton("Manage Plugins",getcustomasset("infiniteyield/assets/bindsandplugins.png"),743)
+Plugins = makeSettingsButton("Manage Plugins",getcustomasset("incogno/assets/bindsandplugins.png"),743)
 Plugins.Position = UDim2.new(0, 5, 0, 175)
 Plugins.Size = UDim2.new(1, -10, 0, 25)
 Plugins.Name = "Plugins"
@@ -697,7 +699,7 @@ CloseImage.BackgroundColor3 = Color3.new(1, 1, 1)
 CloseImage.BackgroundTransparency = 1
 CloseImage.Position = UDim2.new(0, 5, 0, 5)
 CloseImage.Size = UDim2.new(0, 10, 0, 10)
-CloseImage.Image = getcustomasset("infiniteyield/assets/close.png")
+CloseImage.Image = getcustomasset("incogno/assets/close.png")
 CloseImage.ZIndex = 10
 
 PinButton.Name = "PinButton"
@@ -713,7 +715,7 @@ PinImage.BackgroundTransparency = 1
 PinImage.Position = UDim2.new(0, 3, 0, 3)
 PinImage.Size = UDim2.new(0, 14, 0, 14)
 PinImage.ZIndex = 10
-PinImage.Image = getcustomasset("infiniteyield/assets/pin.png")
+PinImage.Image = getcustomasset("incogno/assets/pin.png")
 
 Tooltip.Name = randomString()
 Tooltip.Parent = ScaledHolder
@@ -771,7 +773,7 @@ Logo.BackgroundTransparency = 1
 Logo.BorderSizePixel = 0
 Logo.Position = UDim2.new(0, 125, 0, 127)
 Logo.Size = UDim2.new(0, 10, 0, 10)
-Logo.Image = getcustomasset("infiniteyield/assets/logo.png")
+Logo.Image = getcustomasset("incogno/assets/logo.png")
 Logo.ImageTransparency = 0
 Logo.ZIndex = 10
 
@@ -1160,7 +1162,7 @@ ExitImage_2.BackgroundTransparency = 1
 ExitImage_2.Position = UDim2.new(0, 5, 0, 5)
 ExitImage_2.Size = UDim2.new(0, 10, 0, 10)
 ExitImage_2.ZIndex = 10
-ExitImage_2.Image = getcustomasset("infiniteyield/assets/close.png")
+ExitImage_2.Image = getcustomasset("incogno/assets/close.png")
 
 PositionsFrame.Name = "PositionsFrame"
 PositionsFrame.Parent = Settings
@@ -1500,7 +1502,7 @@ Img.Parent = background_3
 Img.BackgroundTransparency = 1
 Img.Position = UDim2.new(0, 242, 0, 3)
 Img.Size = UDim2.new(0, 100, 0, 95)
-Img.Image = getcustomasset("infiniteyield/assets/imgstudiopluginlogo.png")
+Img.Image = getcustomasset("incogno/assets/imgstudiopluginlogo.png")
 Img.ZIndex = 10
 
 AddPlugin.Name = "AddPlugin"
@@ -1594,7 +1596,7 @@ ExitImage_3.BackgroundColor3 = Color3.new(1, 1, 1)
 ExitImage_3.BackgroundTransparency = 1
 ExitImage_3.Position = UDim2.new(0, 5, 0, 5)
 ExitImage_3.Size = UDim2.new(0, 10, 0, 10)
-ExitImage_3.Image = getcustomasset("infiniteyield/assets/close.png")
+ExitImage_3.Image = getcustomasset("incogno/assets/close.png")
 ExitImage_3.ZIndex = 10
 
 AliasHint.Name = "AliasHint"
@@ -1752,7 +1754,7 @@ ExitImage_5.BackgroundColor3 = Color3.new(1, 1, 1)
 ExitImage_5.BackgroundTransparency = 1
 ExitImage_5.Position = UDim2.new(0, 5, 0, 5)
 ExitImage_5.Size = UDim2.new(0, 10, 0, 10)
-ExitImage_5.Image = getcustomasset("infiniteyield/assets/close.png")
+ExitImage_5.Image = getcustomasset("incogno/assets/close.png")
 ExitImage_5.ZIndex = 10
 
 logs.Name = randomString()
@@ -1785,7 +1787,7 @@ ImageLabel.BackgroundColor3 = Color3.new(1, 1, 1)
 ImageLabel.BackgroundTransparency = 1
 ImageLabel.Position = UDim2.new(0, 3, 0, 3)
 ImageLabel.Size = UDim2.new(0, 14, 0, 14)
-ImageLabel.Image = getcustomasset("infiniteyield/assets/minimize.png")
+ImageLabel.Image = getcustomasset("incogno/assets/minimize.png")
 ImageLabel.ZIndex = 10
 
 PopupText.Name = "PopupText"
@@ -1813,7 +1815,7 @@ ImageLabel_2.BackgroundColor3 = Color3.new(1, 1, 1)
 ImageLabel_2.BackgroundTransparency = 1
 ImageLabel_2.Position = UDim2.new(0, 5, 0, 5)
 ImageLabel_2.Size = UDim2.new(0, 10, 0, 10)
-ImageLabel_2.Image = getcustomasset("infiniteyield/assets/close.png")
+ImageLabel_2.Image = getcustomasset("incogno/assets/close.png")
 ImageLabel_2.ZIndex = 10
 
 background.Name = "background"
@@ -2312,7 +2314,7 @@ eventEditor = (function()
 		{2,"Frame",{BackgroundColor3=currentShade2,BorderSizePixel=0,Name="TopBar",Parent={1},Size=UDim2.new(1,0,0,20),ZIndex=10,}},
 		{3,"TextLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=3,Name="Title",Parent={2},Position=UDim2.new(0,0,0,0),Size=UDim2.new(1,0,0.95,0),Text="Event Editor",TextColor3=Color3.new(1,1,1),TextSize=14,TextXAlignment=Enum.TextXAlignment.Center,ZIndex=10,}},
 		{4,"TextButton",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=3,Name="Close",Parent={2},Position=UDim2.new(1,-20,0,0),Size=UDim2.new(0,20,0,20),Text="",TextColor3=Color3.new(1,1,1),TextSize=14,ZIndex=10,}},
-		{5,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image=getcustomasset("infiniteyield/assets/close.png"),Parent={4},Position=UDim2.new(0,5,0,5),Size=UDim2.new(0,10,0,10),ZIndex=10,}},
+		{5,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image=getcustomasset("incogno/assets/close.png"),Parent={4},Position=UDim2.new(0,5,0,5),Size=UDim2.new(0,10,0,10),ZIndex=10,}},
 		{6,"Frame",{BackgroundColor3=currentShade1,BorderSizePixel=0,Name="Content",Parent={1},Position=UDim2.new(0,0,0,20),Size=UDim2.new(1,0,0,202),ZIndex=10,}},
 		{7,"ScrollingFrame",{BackgroundColor3=Color3.new(0.14117647707462,0.14117647707462,0.14509804546833),BackgroundTransparency=1,BorderColor3=Color3.new(0.15686275064945,0.15686275064945,0.15686275064945),BorderSizePixel=0,BottomImage="rbxasset://textures/ui/Scroll/scroll-middle.png",CanvasSize=UDim2.new(0,0,0,100),Name="List",Parent={6},Position=UDim2.new(0,5,0,5),ScrollBarImageColor3=Color3.new(0.30588236451149,0.30588236451149,0.3098039329052),ScrollBarThickness=8,Size=UDim2.new(1,-10,1,-10),TopImage="rbxasset://textures/ui/Scroll/scroll-middle.png",ZIndex=10,}},
 		{8,"Frame",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Name="Holder",Parent={7},Size=UDim2.new(1,0,1,0),ZIndex=10,}},
@@ -2368,7 +2370,7 @@ eventEditor = (function()
 		{50,"TextBox",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,ClearTextOnFocus=false,Font=3,Parent={49},PlaceholderColor3=Color3.new(1,1,1),Position=UDim2.new(0,5,0,0),Size=UDim2.new(1,-45,0,20),Text="a\\b\\c\\d",TextColor3=currentText1,TextSize=14,TextXAlignment=0,ZIndex=10,}},
 		{51,"TextButton",{BackgroundColor3=currentShade1,BorderSizePixel=0,Font=3,Name="Delete",Parent={49},Position=UDim2.new(1,-20,0,0),Size=UDim2.new(0,20,0,20),Text="X",TextColor3=Color3.new(1,1,1),TextSize=18,ZIndex=10,}},
 		{52,"TextButton",{BackgroundColor3=currentShade1,BorderSizePixel=0,Font=3,Name="Settings",Parent={49},Position=UDim2.new(1,-40,0,0),Size=UDim2.new(0,20,0,20),Text="",TextColor3=Color3.new(1,1,1),TextSize=18,ZIndex=10,}},
-		{53,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image=getcustomasset("infiniteyield/assets/settings.png"),Parent={52},Position=UDim2.new(0,2,0,2),Size=UDim2.new(0,16,0,16),ZIndex=10,}},
+		{53,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image=getcustomasset("incogno/assets/settings.png"),Parent={52},Position=UDim2.new(0,2,0,2),Size=UDim2.new(0,16,0,16),ZIndex=10,}},
 	})
 	main.Name = randomString()
 	local mainFrame = main:WaitForChild("Content")
@@ -2786,7 +2788,7 @@ reference = (function()
 		{2,"Frame",{BackgroundColor3=Color3.new(0.1803921610117,0.1803921610117,0.1843137294054),BorderSizePixel=0,Name="TopBar",Parent={1},Size=UDim2.new(1,0,0,20),ZIndex=10,}},
 		{3,"TextLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=3,Name="Title",Parent={2},Size=UDim2.new(1,0,0.94999998807907,0),Text="Reference",TextColor3=Color3.new(1,1,1),TextSize=14,ZIndex=10,}},
 		{4,"TextButton",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=3,Name="Close",Parent={2},Position=UDim2.new(1,-20,0,0),Size=UDim2.new(0,20,0,20),Text="",TextColor3=Color3.new(1,1,1),TextSize=14,ZIndex=10,}},
-		{5,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image=getcustomasset("infiniteyield/assets/close.png"),Parent={4},Position=UDim2.new(0,5,0,5),Size=UDim2.new(0,10,0,10),ZIndex=10,}},
+		{5,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image=getcustomasset("incogno/assets/close.png"),Parent={4},Position=UDim2.new(0,5,0,5),Size=UDim2.new(0,10,0,10),ZIndex=10,}},
 		{6,"Frame",{BackgroundColor3=Color3.new(0.14117647707462,0.14117647707462,0.14509804546833),BorderSizePixel=0,Name="Content",Parent={1},Position=UDim2.new(0,0,0,20),Size=UDim2.new(1,0,0,300),ZIndex=10,}},
 		{7,"ScrollingFrame",{BackgroundColor3=Color3.new(0.14117647707462,0.14117647707462,0.14509804546833),BackgroundTransparency=1,BorderColor3=Color3.new(0.15686275064945,0.15686275064945,0.15686275064945),BorderSizePixel=0,BottomImage="rbxasset://textures/ui/Scroll/scroll-middle.png",CanvasSize=UDim2.new(0,0,0,1313),Name="List",Parent={6},ScrollBarImageColor3=Color3.new(0.30588236451149,0.30588236451149,0.3098039329052),ScrollBarThickness=8,Size=UDim2.new(1,0,1,0),TopImage="rbxasset://textures/ui/Scroll/scroll-middle.png",VerticalScrollBarInset=2,ZIndex=10,}},
 		{8,"UIListLayout",{Parent={7},SortOrder=2,}},
@@ -2947,7 +2949,7 @@ defaultsettings = {
 	StayOpen = false;
 	guiScale = defaultGuiScale;
 	espTransparency = 0.3;
-	keepIY = true;
+	keepINC = true;
 	logsEnabled = false;
 	jLogsEnabled = false;
 	aliases = {};
@@ -2969,7 +2971,7 @@ useFactorySettings = function()
 	prefix = ';'
 	StayOpen = false
 	guiScale = defaultGuiScale
-	KeepInfYield = true
+	KeepINC = true
 	espTransparency = 0.3
 	logsEnabled = false
 	jLogsEnabled = false
@@ -3052,7 +3054,7 @@ function createPopup(title, text)
 	ExitImage.BackgroundTransparency = 1
 	ExitImage.Position = UDim2.new(0, 5, 0, 5)
 	ExitImage.Size = UDim2.new(0, 10, 0, 10)
-	ExitImage.Image = getcustomasset("infiniteyield/assets/close.png")
+	ExitImage.Image = getcustomasset("incogno/assets/close.png")
 	ExitImage.ZIndex = 10
 
 	Popup:TweenPosition(UDim2.new(0.5, -180, 0, 150), "InOut", "Quart", 0.5, true, nil)
@@ -3068,7 +3070,7 @@ local loadedEventData = nil
 local jsonAttempts = 0
 function saves()
 	if writefileExploit() and readfileExploit() and jsonAttempts < 10 then
-		local readSuccess, out = readfile("IY_FE.INC", true)
+		local readSuccess, out = readfile("INC_FE.INC", true)
 		if readSuccess then
 			if out ~= nil and tostring(out):gsub("%s", "") ~= "" then
 				local success, response = pcall(function()
@@ -3076,7 +3078,7 @@ function saves()
 					if vtype(json.prefix, "string") then prefix = json.prefix else prefix = ';' end
 					if vtype(json.StayOpen, "boolean") then StayOpen = json.StayOpen else StayOpen = false end
 					if vtype(json.guiScale, "number") then guiScale = json.guiScale else guiScale = defaultGuiScale end
-					if vtype(json.keepIY, "boolean") then KeepInfYield = json.keepIY else KeepInfYield = true end
+					if vtype(json.keepINC, "boolean") then KeepINC = json.keepINC else KeepINC = true end
 					if vtype(json.espTransparency, "number") then espTransparency = json.espTransparency else espTransparency = 0.3 end
 					if vtype(json.logsEnabled, "boolean") then logsEnabled = json.logsEnabled else logsEnabled = false end
 					if vtype(json.jLogsEnabled, "boolean") then jLogsEnabled = json.jLogsEnabled else jLogsEnabled = false end
@@ -3098,14 +3100,14 @@ function saves()
 					jsonAttempts = jsonAttempts + 1
 					warn("Save Json Error:", response)
 					warn("Overwriting Save File")
-					writefile("IY_FE.INC", defaults, true)
+					writefile("INC_FE.INC", defaults, true)
 					wait()
 					saves()
 				end
 			else
-				writefile("IY_FE.INC", defaults, true)
+				writefile("INC_FE.INC", defaults, true)
 				wait()
-				local dReadSuccess, dOut = readfile("IY_FE.INC", true)
+				local dReadSuccess, dOut = readfile("INC_FE.INC", true)
 				if dReadSuccess and dOut ~= nil and tostring(dOut):gsub("%s", "") ~= "" then
 					saves()
 				else
@@ -3115,9 +3117,9 @@ function saves()
 				end
 			end
 		else
-			writefile("IY_FE.INC", defaults, true)
+			writefile("INC_FE.INC", defaults, true)
 			wait()
-			local dReadSuccess, dOut = readfile("IY_FE.INC", true)
+			local dReadSuccess, dOut = readfile("INC_FE.INC", true)
 			if dReadSuccess and dOut ~= nil and tostring(dOut):gsub("%s", "") ~= "" then
 				saves()
 			else
@@ -3146,7 +3148,7 @@ function updatesaves()
 			prefix = prefix;
 			StayOpen = StayOpen;
 			guiScale = guiScale;
-			keepIY = KeepInfYield;
+			keepINC = KeepINC;
 			espTransparency = espTransparency;
 			logsEnabled = logsEnabled;
 			jLogsEnabled = jLogsEnabled;
@@ -3163,7 +3165,7 @@ function updatesaves()
 			currentScroll = {currentScroll.R,currentScroll.G,currentScroll.B};
 			eventBinds = eventEditor.SaveData()
 		}
-		writefileCooldown("IY_FE.INC", HttpService:JSONEncode(update))
+		writefileCooldown("INC_FE.INC", HttpService:JSONEncode(update))
 	end
 end
 
@@ -3398,7 +3400,7 @@ function CreateJoinLabel(plr,ID)
 	info2.Text = string.gsub(info2.Text, "Loading...",splitDates[2].."/"..splitDates[3].."/"..splitDates[1])
 end
 
-IYMouse.KeyDown:Connect(function(Key)
+INCMouse.KeyDown:Connect(function(Key)
 	if (Key==prefix) then
 		RunService.RenderStepped:Wait()
 		Cmdbar:CaptureFocus()
@@ -3510,7 +3512,7 @@ ColorsButton.MouseButton1Click:Connect(function()
 				local greenInput = pickerFrame.Green.Input
 				local blueInput = pickerFrame.Blue.Input
 
-				local mouse = IYMouse
+				local mouse = INCMouse
 
 				local hue,sat,val = 0,0,1
 				local red,green,blue = 1,1,1
@@ -4164,20 +4166,20 @@ local ClickSelect = nil
 function selectPart()
 	ToPartFrame:TweenPosition(UDim2.new(0.5, -180, 0, 335), "InOut", "Quart", 0.5, true, nil)
 	local function HighlightPart()
-		if selected.Adornee ~= IYMouse.Target then
-			selectionBox.Adornee = IYMouse.Target
+		if selected.Adornee ~= INCMouse.Target then
+			selectionBox.Adornee = INCMouse.Target
 		else
 			selectionBox.Adornee = nil
 		end
 	end
-	ActivateHighlight = IYMouse.Move:Connect(HighlightPart)
+	ActivateHighlight = INCMouse.Move:Connect(HighlightPart)
 	local function SelectPart()
-		if IYMouse.Target ~= nil then
-			selected.Adornee = IYMouse.Target
-			Path.Text = getHierarchy(IYMouse.Target)
+		if INCMouse.Target ~= nil then
+			selected.Adornee = INCMouse.Target
+			Path.Text = getHierarchy(INCMouse.Target)
 		end
 	end
-	ClickSelect = IYMouse.Button1Down:Connect(SelectPart)
+	ClickSelect = INCMouse.Button1Down:Connect(SelectPart)
 end
 
 Part.MouseButton1Click:Connect(function()
@@ -4946,7 +4948,7 @@ IndexContents("", true)
 
 function checkTT()
 	local t
-	local guisAtPosition = COREGUI:GetGuiObjectsAtPosition(IYMouse.X, IYMouse.Y)
+	local guisAtPosition = COREGUI:GetGuiObjectsAtPosition(INCMouse.X, INCMouse.Y)
 
 	for _, gui in pairs(guisAtPosition) do
 		if gui.Parent == CMDsF then
@@ -4955,16 +4957,16 @@ function checkTT()
 	end
 
 	if t ~= nil and t:GetAttribute("Title") ~= nil then
-		local x = IYMouse.X
-		local y = IYMouse.Y
+		local x = INCMouse.X
+		local y = INCMouse.Y
 		local xP
 		local yP
-		if IYMouse.X > 200 then
+		if INCMouse.X > 200 then
 			xP = x - 201
 		else
 			xP = x + 21
 		end
-		if IYMouse.Y > (IYMouse.ViewSizeY-96) then
+		if INCMouse.Y > (INCMouse.ViewSizeY-96) then
 			yP = y - 97
 		else
 			yP = y
@@ -5278,7 +5280,7 @@ local WorldToScreen = function(Object)
 end
 
 local MousePositionToVector2 = function()
-	return Vector2.new(IYMouse.X, IYMouse.Y)
+	return Vector2.new(INCMouse.X, INCMouse.Y)
 end
 
 local GetClosestPlayerFromCursor = function()
@@ -6280,7 +6282,7 @@ local function clicktpFunc()
 		local hipHeight = humanoid and humanoid.HipHeight > 0 and (humanoid.HipHeight + 1)
 		local rootPart = getRoot(character)
 		local rootPartPosition = rootPart.Position
-		local hitPosition = IYMouse.Hit.Position
+		local hitPosition = INCMouse.Hit.Position
 		local newCFrame = CFrame.new(
 			hitPosition, 
 			Vector3.new(rootPartPosition.X, hitPosition.Y, rootPartPosition.Z)
@@ -6291,7 +6293,7 @@ local function clicktpFunc()
 	end)
 end
 
-IYMouse.Button1Down:Connect(function()
+INCMouse.Button1Down:Connect(function()
 	for i,v in pairs(binds) do
 		if v.COMMAND == 'clicktp' then
 			local input = v.KEY
@@ -6305,11 +6307,11 @@ IYMouse.Button1Down:Connect(function()
 		elseif v.COMMAND == 'clickdel' then
 			local input = v.KEY
 			if input == 'RightClick' and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
-				pcall(function() IYMouse.Target:Destroy() end)
+				pcall(function() INCMouse.Target:Destroy() end)
 			elseif input == 'LeftClick' and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-				pcall(function() IYMouse.Target:Destroy() end)
+				pcall(function() INCMouse.Target:Destroy() end)
 			elseif UserInputService:IsKeyDown(Enum.KeyCode[input:sub(14)]) then
-				pcall(function() IYMouse.Target:Destroy() end)
+				pcall(function() INCMouse.Target:Destroy() end)
 			end
 		end
 	end
@@ -6318,7 +6320,7 @@ end)
 PluginsGUI = PluginEditor.background
 
 function addPlugin(name)
-	if name:lower() == 'plugin file name' or name:lower() == 'iy_fe.INC' or name == 'iy_fe' then
+	if name:lower() == 'plugin file name' or name:lower() == 'inc_fe.INC' or name == 'inc_fe' then
 		notify('Plugin Error','Please enter a valid plugin')
 	else
 		local file
@@ -6511,13 +6513,7 @@ Close_4.MouseButton1Click:Connect(function()
 	PluginsFrame:TweenPosition(UDim2.new(0, 0, 0, 175), "InOut", "Quart", 0.5, true, nil)
 end)
 
-local TeleportCheck = false
-Players.LocalPlayer.OnTeleport:Connect(function(State)
-	if KeepInfYield and (not TeleportCheck) and queueteleport then
-		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()")
-	end
-end)
+-- Legacy Infinite Yield teleport loader removed.
 
 addcmd('addalias',{},function(args, speaker)
 	if #args < 2 then return end
@@ -6586,8 +6582,8 @@ end)
 
 addcmd('keepinc', {}, function(args, speaker)
 	if queueteleport then
-		KeepInfYield = true
-		notify('KeepIY','INC will now run after you teleport')
+		KeepINC = true
+		notify('KeepINC','INC will now run after you teleport')
 		updatesaves()
 	else
 		notify('Incompatible Exploit','Your exploit does not support this command (missing queue_on_teleport)')
@@ -6596,8 +6592,8 @@ end)
 
 addcmd('unkeepinc', {}, function(args, speaker)
 	if queueteleport then
-		KeepInfYield = false
-		notify('KeepIY','INC will no longer run after you teleport')
+		KeepINC = false
+		notify('KeepINC','INC will no longer run after you teleport')
 		updatesaves()
 	else
 		notify('Incompatible Exploit','Your exploit does not support this command (missing queue_on_teleport)')
@@ -6606,7 +6602,7 @@ end)
 
 addcmd('togglekeepinc', {}, function(args, speaker)
 	if queueteleport then
-		KeepInfYield = not KeepInfYield
+		KeepINC = not KeepINC
 		updatesaves()
 	else
 		notify('Incompatible Exploit','Your exploit does not support this command (missing queue_on_teleport)')
@@ -6681,7 +6677,7 @@ addcmd('serverinfo',{'info','sinfo'},function(args, speaker)
 		ExitImage.BackgroundTransparency = 1
 		ExitImage.Position = UDim2.new(0, 5, 0, 5)
 		ExitImage.Size = UDim2.new(0, 10, 0, 10)
-		ExitImage.Image = getcustomasset("infiniteyield/assets/close.png")
+		ExitImage.Image = getcustomasset("incogno/assets/close.png")
 		ExitImage.ZIndex = 10
 
 		background.Name = "background"
@@ -7831,7 +7827,7 @@ end)
 
 function deleteGuisAtPos()
 	pcall(function()
-		local guisAtPosition = PlayerGui:GetGuiObjectsAtPosition(IYMouse.X, IYMouse.Y)
+		local guisAtPosition = PlayerGui:GetGuiObjectsAtPosition(INCMouse.X, INCMouse.Y)
 		for _, gui in pairs(guisAtPosition) do
 			if gui.Visible == true then
 				gui:Destroy()
@@ -10301,7 +10297,7 @@ end)
 
 addcmd("mouseteleport", {"mousetp"}, function(args, speaker)
     local root = getRoot(speaker.Character)
-    local pos = IYMouse.Hit
+    local pos = INCMouse.Hit
     if root and pos then
         root.CFrame = CFrame.new(pos.X, pos.Y + 3, pos.Z, select(4, root.CFrame:components()))
         breakVelocity()
@@ -10315,7 +10311,7 @@ addcmd("tptool", {"teleporttool"}, function(args, speaker)
     TpTool.Parent = speaker:FindFirstChildOfClass("Backpack")
     TpTool.Activated:Connect(function()
         local root = getRoot(speaker.Character)
-        local pos = IYMouse.Hit
+        local pos = INCMouse.Hit
         if not root or not pos then return end
         root.CFrame = CFrame.new(pos.X, pos.Y + 3, pos.Z, select(4, root.CFrame:components()))
         breakVelocity()
@@ -10567,6 +10563,12 @@ addcmd('oldconsole',{},function(args, speaker)
 	wait(1)
 	notify('Console','Press F9 to open the console')
 end)
+
+-- ================================================================
+-- EXTERNAL GUI / TOOL LOADERS
+-- These commands load separate external interfaces/tools such as Dex,
+-- Cobalt/RemoteSpy, SimpleSpy, and AudioLogger.
+-- ================================================================
 
 addcmd("explorer", {"dex"}, function(args, speaker)
     notify("Loading", "Hold on a sec")
@@ -12291,7 +12293,7 @@ addcmd('hovername',{},function(args, speaker)
 	nbSelection.Color3 = Color3.new(1, 1, 1)
 	local function updateNameBox()
 		local t
-		local target = IYMouse.Target
+		local target = INCMouse.Target
 
 		if target then
 			local humanoid = target.Parent:FindFirstChildOfClass("Humanoid") or target.Parent.Parent:FindFirstChildOfClass("Humanoid")
@@ -12301,11 +12303,11 @@ addcmd('hovername',{},function(args, speaker)
 		end
 
 		if t ~= nil then
-			local x = IYMouse.X
-			local y = IYMouse.Y
+			local x = INCMouse.X
+			local y = INCMouse.Y
 			local xP
 			local yP
-			if IYMouse.X > 200 then
+			if INCMouse.X > 200 then
 				xP = x - 205
 				nameBox.TextXAlignment = Enum.TextXAlignment.Right
 			else
@@ -12323,7 +12325,7 @@ addcmd('hovername',{},function(args, speaker)
 			nbSelection.Adornee = nil
 		end
 	end
-	nbUpdateFunc = IYMouse.Move:Connect(updateNameBox)
+	nbUpdateFunc = INCMouse.Move:Connect(updateNameBox)
 end)
 
 addcmd('unhovername',{'nohovername'},function(args, speaker)
@@ -13077,7 +13079,7 @@ addcmd("addallplugins", {"loadallplugins"}, function(args, speaker)
 		local fileName = filePath:match("([^/\\]+%.INC)$")
 
 		if fileName and
-			fileName:lower() ~= "iy_fe.INC" and
+			fileName:lower() ~= "inc_fe.INC" and
 			not isfolder(fileName) and
 			not table.find(PluginsTable, fileName)
 		then
@@ -13273,7 +13275,7 @@ if aliases and #aliases > 0 then
 	refreshaliases()
 end
 
-IYMouse.Move:Connect(checkTT)
+INCMouse.Move:Connect(checkTT)
 
 CaptureService.CaptureBegan:Connect(function()
 	PARENT.Enabled = false
@@ -13285,100 +13287,6 @@ CaptureService.CaptureEnded:Connect(function()
 	end)
 end)
 
-task.spawn(function()
-	local success, latestVersionInfo = pcall(function() 
-		local versionJson = game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/version")
-		return HttpService:JSONDecode(versionJson)
-	end)
-
-	if success then
-		if currentVersion ~= latestVersionInfo.Version then
-			notify("Outdated", "Get the new version at infyiff.github.io")
-		end
-
-		if latestVersionInfo.Announcement and latestVersionInfo.Announcement ~= "" then
-			local AnnGUI = Instance.new("Frame")
-			local background = Instance.new("Frame")
-			local TextBox = Instance.new("TextLabel")
-			local shadow = Instance.new("Frame")
-			local PopupText = Instance.new("TextLabel")
-			local Exit = Instance.new("TextButton")
-			local ExitImage = Instance.new("ImageLabel")
-
-			AnnGUI.Name = randomString()
-			AnnGUI.Parent = ScaledHolder
-			AnnGUI.Active = true
-			AnnGUI.BackgroundTransparency = 1
-			AnnGUI.Position = UDim2.new(0.5, -180, 0, -500)
-			AnnGUI.Size = UDim2.new(0, 360, 0, 20)
-			AnnGUI.ZIndex = 10
-
-			background.Name = "background"
-			background.Parent = AnnGUI
-			background.Active = true
-			background.BackgroundColor3 = currentShade1
-			background.BorderSizePixel = 0
-			background.Position = UDim2.new(0, 0, 0, 20)
-			background.Size = UDim2.new(0, 360, 0, 150)
-			background.ZIndex = 10
-
-			TextBox.Parent = background
-			TextBox.BackgroundTransparency = 1
-			TextBox.Position = UDim2.new(0, 5, 0, 5)
-			TextBox.Size = UDim2.new(0, 350, 0, 140)
-			TextBox.Font = Enum.Font.SourceSans
-			TextBox.TextSize = 18
-			TextBox.TextWrapped = true
-			TextBox.Text = latestVersionInfo.Announcement
-			TextBox.TextColor3 = currentText1
-			TextBox.TextXAlignment = Enum.TextXAlignment.Left
-			TextBox.TextYAlignment = Enum.TextYAlignment.Top
-			TextBox.ZIndex = 10
-
-			shadow.Name = "shadow"
-			shadow.Parent = AnnGUI
-			shadow.BackgroundColor3 = currentShade2
-			shadow.BorderSizePixel = 0
-			shadow.Size = UDim2.new(0, 360, 0, 20)
-			shadow.ZIndex = 10
-
-			PopupText.Name = "PopupText"
-			PopupText.Parent = shadow
-			PopupText.BackgroundTransparency = 1
-			PopupText.Size = UDim2.new(1, 0, 0.95, 0)
-			PopupText.ZIndex = 10
-			PopupText.Font = Enum.Font.SourceSans
-			PopupText.TextSize = 14
-			PopupText.Text = "Server Announcement"
-			PopupText.TextColor3 = currentText1
-			PopupText.TextWrapped = true
-
-			Exit.Name = "Exit"
-			Exit.Parent = shadow
-			Exit.BackgroundTransparency = 1
-			Exit.Position = UDim2.new(1, -20, 0, 0)
-			Exit.Size = UDim2.new(0, 20, 0, 20)
-			Exit.Text = ""
-			Exit.ZIndex = 10
-
-			ExitImage.Parent = Exit
-			ExitImage.BackgroundColor3 = Color3.new(1, 1, 1)
-			ExitImage.BackgroundTransparency = 1
-			ExitImage.Position = UDim2.new(0, 5, 0, 5)
-			ExitImage.Size = UDim2.new(0, 10, 0, 10)
-			ExitImage.Image = getcustomasset("infiniteyield/assets/close.png")
-			ExitImage.ZIndex = 10
-
-			task.wait(1)
-			AnnGUI:TweenPosition(UDim2.new(0.5, -180, 0, 150), "InOut", "Quart", 0.5, true, nil)
-
-			Exit.MouseButton1Click:Connect(function()
-				AnnGUI:TweenPosition(UDim2.new(0.5, -180, 0, -500), "InOut", "Quart", 0.5, true, nil)
-				task.wait(0.6)
-				AnnGUI:Destroy()
-			end)
-		end
-	end
 end)
 
 task.spawn(function()
