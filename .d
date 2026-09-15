@@ -1,9 +1,9 @@
-if IY_LOADED and not _G.IY_DEBUG then
+if INC_LOADED and not _G.INC_DEBUG then
 	-- error("INC is already running!", 0)
 	return
 end
 
-pcall(function() getgenv().IY_LOADED = true end)
+pcall(function() getgenv().INC_LOADED = true end)
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 function missing(t, f, fallback)
@@ -299,33 +299,10 @@ function randomString()
 	return table.concat(array)
 end
 
-PARENT = nil
-MAX_DISPLAY_ORDER = 1.7976931348623157e308
-if gethui then
-    local Main = Instance.new("ScreenGui")
-    Main.Name = randomString()
-    Main.ResetOnSpawn = false
-    Main.DisplayOrder = MAX_DISPLAY_ORDER
-    Main.Parent = gethui()
-    PARENT = Main
-elseif (not is_sirhurt_closure) and syn_protect_gui then
-    local Main = Instance.new("ScreenGui")
-    Main.Name = randomString()
-    Main.ResetOnSpawn = false
-    Main.DisplayOrder = MAX_DISPLAY_ORDER
-    syn_protect_gui(Main)
-    Main.Parent = COREGUI
-    PARENT = Main
-elseif COREGUI:FindFirstChild("RobloxGui") then
-    PARENT = COREGUI.RobloxGui
-else
-    local Main = Instance.new("ScreenGui")
-    Main.Name = randomString()
-    Main.ResetOnSpawn = false
-    Main.DisplayOrder = MAX_DISPLAY_ORDER
-    Main.Parent = COREGUI
-    PARENT = Main
-end
+-- Backend-only parent: the legacy INC/INC interface is never parented
+-- to PlayerGui/CoreGui, preventing the old GUI from appearing or flashing.
+PARENT = Instance.new("Folder")
+PARENT.Name = "INC_Backend"
 
 shade1 = {}
 shade2 = {}
@@ -1527,7 +1504,7 @@ About.Position = UDim2.new(0, 17, 0, 10)
 About.Size = UDim2.new(0, 187, 0, 49)
 About.Font = Enum.Font.SourceSans
 About.TextSize = 14
-About.Text = "Plugins are .iy files and should be located in the 'workspace' folder of your exploit."
+About.Text = "Plugins are .INC files and should be located in the 'workspace' folder of your exploit."
 About.TextColor3 = Color3.fromRGB(255, 255, 255)
 About.TextWrapped = true
 About.TextYAlignment = Enum.TextYAlignment.Top
@@ -1608,7 +1585,7 @@ PluginsHint.Position = UDim2.new(0, 25, 0, 40)
 PluginsHint.Size = UDim2.new(0, 200, 0, 50)
 PluginsHint.Font = Enum.Font.SourceSansItalic
 PluginsHint.TextSize = 16
-PluginsHint.Text = "Download plugins from the IY Discord (discord.gg/78ZuWSq)"
+PluginsHint.Text = "Download plugins from the INC Discord (discord.gg/78ZuWSq)"
 PluginsHint.TextColor3 = Color3.new(1, 1, 1)
 PluginsHint.TextStrokeColor3 = Color3.new(1, 1, 1)
 PluginsHint.TextWrapped = true
@@ -2883,7 +2860,7 @@ reference = (function()
 		{111,"TextLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=3,Name="Text",Parent={105},Position=UDim2.new(0,8,0,148),Size=UDim2.new(1,-8,0,16),Text="Setting up 'goto $1' on the OnChatted event will teleport you to any player that chats.",TextColor3=Color3.new(1,1,1),TextSize=14,TextWrapped=true,TextXAlignment=0,TextYAlignment=0,ZIndex=10,}},
 		{112,"Frame",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Name="Section",Parent={7},Size=UDim2.new(1,0,0,105),ZIndex=10,}},
 		{113,"TextLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=4,Name="Header",Parent={112},Position=UDim2.new(0,8,0,5),Size=UDim2.new(1,-8,0,20),Text="Get Further Help",TextColor3=Color3.new(1,1,1),TextSize=20,TextXAlignment=0,ZIndex=10,}},
-		{114,"TextLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=3,Name="Text",Parent={112},Position=UDim2.new(0,8,0,30),Size=UDim2.new(1,-8,0,32),Text="You can join the Discord server to get support with IY,  and read up on more documentation such as the Plugin API.",TextColor3=Color3.new(1,1,1),TextSize=14,TextWrapped=true,TextXAlignment=0,ZIndex=10,}},
+		{114,"TextLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=3,Name="Text",Parent={112},Position=UDim2.new(0,8,0,30),Size=UDim2.new(1,-8,0,32),Text="You can join the Discord server to get support with INC,  and read up on more documentation such as the Plugin API.",TextColor3=Color3.new(1,1,1),TextSize=14,TextWrapped=true,TextXAlignment=0,ZIndex=10,}},
 		{115,"Frame",{BackgroundColor3=Color3.new(0.1803921610117,0.1803921610117,0.1843137294054),BorderSizePixel=0,Name="Line",Parent={112},Position=UDim2.new(0,10,1,-1),Size=UDim2.new(1,-20,0,1),Visible=false,ZIndex=10,}},
 		{116,"TextButton",{BackgroundColor3=Color3.new(0.48627451062202,0.61960786581039,0.85098040103912),BorderColor3=Color3.new(0.1803921610117,0.1803921610117,0.1843137294054),Font=4,Name="InviteButton",Parent={112},Position=UDim2.new(0,5,0,75),Size=UDim2.new(1,-10,0,25),Text="Copy Discord Invite Link (https://discord.gg/78ZuWSq)",TextColor3=Color3.new(0.1803921610117,0.1803921610117,0.1843137294054),TextSize=16,ZIndex=10,}},
 	})
@@ -3056,7 +3033,7 @@ local loadedEventData = nil
 local jsonAttempts = 0
 function saves()
 	if writefileExploit() and readfileExploit() and jsonAttempts < 10 then
-		local readSuccess, out = readfile("IY_FE.iy", true)
+		local readSuccess, out = readfile("IY_FE.INC", true)
 		if readSuccess then
 			if out ~= nil and tostring(out):gsub("%s", "") ~= "" then
 				local success, response = pcall(function()
@@ -3086,14 +3063,14 @@ function saves()
 					jsonAttempts = jsonAttempts + 1
 					warn("Save Json Error:", response)
 					warn("Overwriting Save File")
-					writefile("IY_FE.iy", defaults, true)
+					writefile("IY_FE.INC", defaults, true)
 					wait()
 					saves()
 				end
 			else
-				writefile("IY_FE.iy", defaults, true)
+				writefile("IY_FE.INC", defaults, true)
 				wait()
-				local dReadSuccess, dOut = readfile("IY_FE.iy", true)
+				local dReadSuccess, dOut = readfile("IY_FE.INC", true)
 				if dReadSuccess and dOut ~= nil and tostring(dOut):gsub("%s", "") ~= "" then
 					saves()
 				else
@@ -3103,9 +3080,9 @@ function saves()
 				end
 			end
 		else
-			writefile("IY_FE.iy", defaults, true)
+			writefile("IY_FE.INC", defaults, true)
 			wait()
-			local dReadSuccess, dOut = readfile("IY_FE.iy", true)
+			local dReadSuccess, dOut = readfile("IY_FE.INC", true)
 			if dReadSuccess and dOut ~= nil and tostring(dOut):gsub("%s", "") ~= "" then
 				saves()
 			else
@@ -3151,7 +3128,7 @@ function updatesaves()
 			currentScroll = {currentScroll.R,currentScroll.G,currentScroll.B};
 			eventBinds = eventEditor.SaveData()
 		}
-		writefileCooldown("IY_FE.iy", HttpService:JSONEncode(update))
+		writefileCooldown("IY_FE.INC", HttpService:JSONEncode(update))
 	end
 end
 
@@ -3172,7 +3149,7 @@ if type(binds) ~= "table" then binds = {} end
 
 if type(PluginsTable) == "table" then
 	for i = #PluginsTable, 1, -1 do
-		if string.sub(PluginsTable[i], -3) ~= ".iy" then
+		if string.sub(PluginsTable[i], -3) ~= ".INC" then
 			table.remove(PluginsTable, i)
 		end
 	end
@@ -4506,11 +4483,11 @@ CMDs[#CMDs + 1] = {NAME = 'hideguis', DESC = 'Hides any GUIs in PlayerGui'}
 CMDs[#CMDs + 1] = {NAME = 'unhideguis', DESC = 'Undoes hideguis'}
 CMDs[#CMDs + 1] = {NAME = 'guidelete', DESC = 'Enables backspace to delete GUI'}
 CMDs[#CMDs + 1] = {NAME = 'unguidelete / noguidelete', DESC = 'Disables guidelete'}
-CMDs[#CMDs + 1] = {NAME = 'hideiy', DESC = 'Hides the main IY GUI'}
-CMDs[#CMDs + 1] = {NAME = 'showiy / unhideiy', DESC = 'Shows IY again'}
-CMDs[#CMDs + 1] = {NAME = 'keepiy', DESC = 'Auto execute IY when you teleport through servers'}
-CMDs[#CMDs + 1] = {NAME = 'unkeepiy', DESC = 'Disable keepiy'}
-CMDs[#CMDs + 1] = {NAME = 'togglekeepiy', DESC = 'Toggles keepiy'}
+CMDs[#CMDs + 1] = {NAME = 'hideinc', DESC = 'Hides the main INC GUI'}
+CMDs[#CMDs + 1] = {NAME = 'showinc / unhideinc', DESC = 'Shows INC again'}
+CMDs[#CMDs + 1] = {NAME = 'keepinc', DESC = 'Auto execute INC when you teleport through servers'}
+CMDs[#CMDs + 1] = {NAME = 'unkeepinc', DESC = 'Disable keepinc'}
+CMDs[#CMDs + 1] = {NAME = 'togglekeepinc', DESC = 'Toggles keepinc'}
 CMDs[#CMDs + 1] = {NAME = 'removeads / adblock', DESC = 'Automatically removes ad billboards'}
 CMDs[#CMDs + 1] = {NAME = 'savegame / saveplace', DESC = 'Uses saveinstance to save the game'}
 CMDs[#CMDs + 1] = {NAME = 'clearerror', DESC = 'Clears the annoying box and blur when a game kicks you'}
@@ -5164,7 +5141,7 @@ function execCmd(cmdStr,speaker,store)
 				if infTimes then
 					while lastBreakTime < cmdStartTime do
 						local success,err = pcall(cmd.FUNC,args, speaker)
-						if not success and _G.IY_DEBUG then
+						if not success and _G.INC_DEBUG then
 							warn("Command Error:", cmdName, err)
 						end
 						wait(cmdDelay)
@@ -5175,7 +5152,7 @@ function execCmd(cmdStr,speaker,store)
 						local success,err = pcall(function()
 							cmd.FUNC(args, speaker)
 						end)
-						if not success and _G.IY_DEBUG then
+						if not success and _G.INC_DEBUG then
 							warn("Command Error:", cmdName, err)
 						end
 						if cmdDelay ~= 0 then wait(cmdDelay) end
@@ -6306,17 +6283,17 @@ end)
 PluginsGUI = PluginEditor.background
 
 function addPlugin(name)
-	if name:lower() == 'plugin file name' or name:lower() == 'iy_fe.iy' or name == 'iy_fe' then
+	if name:lower() == 'plugin file name' or name:lower() == 'iy_fe.INC' or name == 'iy_fe' then
 		notify('Plugin Error','Please enter a valid plugin')
 	else
 		local file
 		local fileName
-		if name:sub(-3) == '.iy' then
+		if name:sub(-3) == '.INC' then
 			pcall(function() file = readfile(name) end)
 			fileName = name
 		else
-			pcall(function() file = readfile(name..'.iy') end)
-			fileName = name..'.iy'
+			pcall(function() file = readfile(name..'.INC') end)
+			fileName = name..'.INC'
 		end
 		if file then
 			if not FindInTable(PluginsTable, fileName) then
@@ -6334,8 +6311,8 @@ function addPlugin(name)
 end
 
 function deletePlugin(name)
-	local pName = name..'.iy'
-	if name:sub(-3) == '.iy' then
+	local pName = name..'.INC'
+	if name:sub(-3) == '.INC' then
 		pName = name
 	end
 	for i = #cmds,1,-1 do
@@ -6572,7 +6549,7 @@ addcmd('discord', {'support', 'help'}, function(args, speaker)
 	end
 end)
 
-addcmd('keepiy', {}, function(args, speaker)
+addcmd('keepinc', {}, function(args, speaker)
 	if queueteleport then
 		KeepInfYield = true
 		notify('KeepIY','INC will now run after you teleport')
@@ -6582,7 +6559,7 @@ addcmd('keepiy', {}, function(args, speaker)
 	end
 end)
 
-addcmd('unkeepiy', {}, function(args, speaker)
+addcmd('unkeepinc', {}, function(args, speaker)
 	if queueteleport then
 		KeepInfYield = false
 		notify('KeepIY','INC will no longer run after you teleport')
@@ -6592,7 +6569,7 @@ addcmd('unkeepiy', {}, function(args, speaker)
 	end
 end)
 
-addcmd('togglekeepiy', {}, function(args, speaker)
+addcmd('togglekeepinc', {}, function(args, speaker)
 	if queueteleport then
 		KeepInfYield = not KeepInfYield
 		updatesaves()
@@ -7846,7 +7823,7 @@ addcmd('unguidelete',{'noguidelete'},function(args, speaker)
 end)
 
 local wasStayOpen = StayOpen
-addcmd('hideiy',{},function(args, speaker)
+addcmd('hideinc',{},function(args, speaker)
 	isHidden = true
 	wasStayOpen = StayOpen
 	if StayOpen == true then
@@ -7855,10 +7832,10 @@ addcmd('hideiy',{},function(args, speaker)
 	end
 	minimizeNum = 0
 	minimizeHolder()
-	if not (args[1] and tostring(args[1]) == 'nonotify') then notify('IY Hidden','You can press the prefix key to access the command bar') end
+	if not (args[1] and tostring(args[1]) == 'nonotify') then notify('INC Hidden','You can press the prefix key to access the command bar') end
 end)
 
-addcmd('showiy',{'unhideiy'},function(args, speaker)
+addcmd('showinc',{'unhideinc'},function(args, speaker)
 	isHidden = false
 	minimizeNum = -20
 	if wasStayOpen then
@@ -13063,10 +13040,10 @@ addcmd("addallplugins", {"loadallplugins"}, function(args, speaker)
 	end
 
 	for _, filePath in ipairs(listfiles("")) do
-		local fileName = filePath:match("([^/\\]+%.iy)$")
+		local fileName = filePath:match("([^/\\]+%.INC)$")
 
 		if fileName and
-			fileName:lower() ~= "iy_fe.iy" and
+			fileName:lower() ~= "iy_fe.INC" and
 			not isfolder(fileName) and
 			not table.find(PluginsTable, fileName)
 		then
@@ -13081,7 +13058,7 @@ end)
 
 addcmd("debug", {}, function(args, speaker)
     local opt = parseBoolean(args[1], true)
-    _G.IY_DEBUG = opt
+    _G.INC_DEBUG = opt
     notify("debug", tostring(opt), 1)
 end)
 
@@ -13095,7 +13072,7 @@ if IsOnMobile then
 	QuickCapture.Position = UDim2.new(0.489, 0, 0, 0)
 	QuickCapture.Size = UDim2.new(0, 32, 0, 33)
 	QuickCapture.Font = Enum.Font.SourceSansBold
-	QuickCapture.Text = "IY"
+	QuickCapture.Text = "INC"
 	QuickCapture.TextColor3 = Color3.fromRGB(255, 255, 255)
 	QuickCapture.TextSize = 20
 	QuickCapture.TextWrapped = true
@@ -13402,7 +13379,8 @@ do
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-    -- Keep the original backend alive, but hide its old UI.
+    -- Keep the original command backend alive without rendering its legacy UI.
+    -- The parent was intentionally changed to a non-GUI Folder above.
     pcall(function() Holder.Visible = false end)
     pcall(function() Tooltip.Visible = false end)
     pcall(function() Notification.Visible = false end)
@@ -13431,9 +13409,9 @@ do
 
     local PREFIX = ";"
     local customAliases = {
-        hideinc = "hideiy", showinc = "showiy", unhideinc = "unhideiy",
-        keepinc = "keepiy", unkeepinc = "unkeepiy", togglekeepinc = "togglekeepiy",
-        hide_inc = "hideiy", show_inc = "showiy",
+        hideinc = "hideinc", showinc = "showinc", unhideinc = "unhideinc",
+        keepinc = "keepinc", unkeepinc = "unkeepinc", togglekeepinc = "togglekeepinc",
+        hide_inc = "hideinc", show_inc = "showinc",
     }
 
     local CommandMeta = {}
@@ -13450,12 +13428,12 @@ do
         text = tostring(text or "")
         text = text:gsub("[Ii]nfinite Yield", "INC")
         text = text:gsub("%f[%a][Ii][Yy]%f[%A]", "INC")
-        text = text:gsub("hideiy", "hideinc")
-        text = text:gsub("showiy", "showinc")
-        text = text:gsub("unhideiy", "unhideinc")
-        text = text:gsub("keepiy", "keepinc")
-        text = text:gsub("unkeepiy", "unkeepinc")
-        text = text:gsub("togglekeepiy", "togglekeepinc")
+        text = text:gsub("hideinc", "hideinc")
+        text = text:gsub("showinc", "showinc")
+        text = text:gsub("unhideinc", "unhideinc")
+        text = text:gsub("keepinc", "keepinc")
+        text = text:gsub("unkeepinc", "unkeepinc")
+        text = text:gsub("togglekeepinc", "togglekeepinc")
         return text
     end
 
@@ -13759,6 +13737,15 @@ do
         if category == "All Commands" then return true end
         if category == "Client-Sided" then return meta.Scope == "Client-Sided" end
         if category == "Server-Sided" then return meta.Scope == "Server-Sided" end
+        if category == "External GUIs" then
+            local n = meta.Name:lower()
+            return n == "console" or n == "oldconsole"
+                or n == "explorer" or n == "dex"
+                or n == "moondex" or n == "mdex"
+                or n == "remotespy" or n == "rspy"
+                or n == "simplespy" or n == "sspy"
+                or n == "audiologger" or n == "alogger"
+        end
         if category == "Player" then
             local s = meta.Section
             return s=="Player Physics" or s=="Waypoints" or s=="Teleportation" or s=="Camera"
@@ -13972,6 +13959,9 @@ do
             if commandName=="player" then displayHelp(console,clayout,"Player"); return end
             if commandName=="clientsided" or commandName=="client-sided" then displayHelp(console,clayout,"Client-Sided"); return end
             if commandName=="serversided" or commandName=="server-sided" then displayHelp(console,clayout,"Server-Sided"); return end
+            if commandName=="externalguis" or commandName=="external-guis" or commandName=="guis" then
+                displayHelp(console,clayout,"External GUIs"); return
+            end
 
             if customAliases[commandName] then commandName = customAliases[commandName] end
             local resolved = commandName
@@ -14025,11 +14015,11 @@ do
     end)
 
     pcall(function()
-        overridecmd("hideiy", function()
+        overridecmd("hideinc", function()
             hidden = true
             main.Visible = false
         end)
-        overridecmd("showiy", function()
+        overridecmd("showinc", function()
             hidden = false
             main.Visible = true
         end)
